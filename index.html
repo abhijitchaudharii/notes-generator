@@ -694,12 +694,16 @@
               placeholder="Template Name (e.g. Blank-Notes)"
               class="w-full mb-3 border rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500"
             />
+            <!-- Quick Insert Toolbar -->
+            <div id="toolbar" class="flex flex-wrap gap-2 mb-3"></div>
 
             <textarea
               id="templateText"
               placeholder="Enter template text..."
               class="w-full border rounded-lg px-4 py-3 h-28 resize-none focus:ring-2 focus:ring-indigo-500"
             ></textarea>
+            <!-- Validation output -->
+            <div id="validationHints" class="mt-2 text-sm"></div>
 
             <div class="flex flex-wrap gap-2 mt-3">
               <button

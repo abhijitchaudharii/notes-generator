@@ -1358,6 +1358,152 @@ function resetTemplates() {
   showToast("Templates reset to default", "modal");
 }
 
+const placeholders = [
+  "NAME",
+  "EIN",
+  "OGEA",
+  "ONT_SERIAL",
+  "SPARE_ONT",
+  "ROUTE",
+  "LIGHT",
+  "REFERENCE",
+  "DOWNSTREAM",
+  "UPSTREAM",
+  "CORRECT_SASA",
+  "INCORRECT_SASA",
+  "SASA_1",
+  "SASA_2",
+];
+
+const toolbar = document.getElementById("toolbar");
+const textarea = document.getElementById("templateText");
+
+// Build toolbar buttons dynamically
+placeholders.forEach((ph) => {
+  const btn = document.createElement("button");
+  btn.textContent = ph;
+  btn.className =
+    "px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700";
+  btn.addEventListener("click", () => insertPlaceholder(ph));
+  toolbar.appendChild(btn);
+});
+
+function insertPlaceholder(token) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+
+  // Insert placeholder at cursor
+  textarea.value =
+    text.substring(0, start) + `[[${token}]]` + text.substring(end);
+
+  // Move cursor after inserted token
+  textarea.selectionStart = textarea.selectionEnd =
+    start + `[[${token}]]`.length;
+  textarea.focus();
+}
+
+//template place holder validation
+document.addEventListener("DOMContentLoaded", () => {
+  const validPlaceholders = [
+    "NAME",
+    "EIN",
+    "OGEA",
+    "ONT_SERIAL",
+    "SPARE_ONT",
+    "ROUTE",
+    "LIGHT",
+    "REFERENCE",
+    "DOWNSTREAM",
+    "UPSTREAM",
+    "CORRECT_SASA",
+    "INCORRECT_SASA",
+    "SASA_1",
+    "SASA_2",
+  ];
+
+  const textarea = document.getElementById("templateText");
+  const hints = document.getElementById("validationHints");
+
+  textarea.addEventListener("input", validateTemplate);
+
+  function validateTemplate() {
+    const text = textarea.value;
+    const errors = [];
+
+    // Match [[PLACEHOLDER]]
+    const regexDouble = /\[\[([A-Za-z0-9_]+)\]\]/g;
+
+    // Match [PLACEHOLDER] but not [[PLACEHOLDER]]
+    const regexSingle = /(?<!\[)\[([A-Za-z0-9_]+)\](?!\])/g;
+
+    let match;
+
+    // -----------------------------
+    // Check valid double brackets
+    // -----------------------------
+    while ((match = regexDouble.exec(text)) !== null) {
+      const token = match[1];
+
+      if (!validPlaceholders.includes(token)) {
+        errors.push(`[[${match[1]}]] → invalid placeholder`);
+      }
+    }
+
+    // -----------------------------
+    // Check single brackets
+    // -----------------------------
+    while ((match = regexSingle.exec(text)) !== null) {
+      const token = match[1].toUpperCase();
+
+      if (validPlaceholders.includes(token)) {
+        errors.push(`[${match[1]}] → should be [[${token}]]`);
+      } else {
+        errors.push(
+          `[${match[1]}] → invalid placeholder and should use double brackets`,
+        );
+      }
+    }
+
+    // -----------------------------
+    // Remove all valid placeholders
+    // before malformed checks
+    // -----------------------------
+    const cleanedText = text
+      .replace(/\[\[[A-Za-z0-9_]+\]\]/g, "")
+      .replace(/(?<!\[)\[[A-Za-z0-9_]+\](?!\])/g, "");
+
+    // -----------------------------
+    // Check unmatched brackets
+    // -----------------------------
+    const openCount = (cleanedText.match(/\[/g) || []).length;
+    const closeCount = (cleanedText.match(/\]/g) || []).length;
+
+    if (openCount > closeCount) {
+      errors.push("Missing closing bracket ]");
+    }
+
+    if (closeCount > openCount) {
+      errors.push("Missing opening bracket [");
+    }
+
+    // -----------------------------
+    // Display results
+    // -----------------------------
+    if (errors.length > 0) {
+      hints.innerHTML = errors
+        .map((err) => `<span class="text-red-600">❌ Invalid: ${err}</span>`)
+        .join("<br>");
+    } else {
+      hints.innerHTML =
+        '<span class="text-green-600">✅ All placeholders valid</span>';
+    }
+  }
+
+  // Run once on load
+  validateTemplate();
+});
+
 //previewTemplate
 function previewTemplate() {
   const previewBox = document.getElementById("templatePreview");
