@@ -23,16 +23,6 @@ A modern web-based application designed to simplify FTTP troubleshooting note cr
 * JavaScript
 * Local Storage API
 
-## 📸 Screenshots
-
-> Add screenshots of your application here.
-
-```text
-<img width="1638" height="807" alt="image" src="https://github.com/user-attachments/assets/1c609788-d699-499c-8e89-ce32042cc0cf" />
-
-
-```
-
 ## 🚀 Getting Started
 
 ### Clone the repository
