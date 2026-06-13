@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>FTTP ES Notes</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-slate-100 dark:bg-slate-900 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-lg bg-white/70 border-b">
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <!-- Logo -->
+        <h1 class="text-xl md:text-3xl font-bold text-indigo-600">
+          FTTP ES Notes
+        </h1>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-2">
+          <button
+            id="openTemplateBtn"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            ➕ Add Template
+          </button>
+
+          <button
+            id="historyBtn"
+            class="px-4 py-2 action-btn bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            History
+          </button>
+          <button
+            id="themeToggle"
+            class="px-4 py-2 rounded-lg bg-slate-800 text-white"
+          >
+            🌙
+          </button>
+        </div>
+
+        <!-- Mobile Burger -->
+        <button id="menuBtn" class="md:hidden p-2 rounded-lg bg-slate-200">
+          ☰
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden px-4 pb-4">
+        <div class="flex flex-col gap-2">
+          <button id="mobileAddTemplateBtn" class="action-btn bg-indigo-600">
+            Add Template
+          </button>
+
+          <button id="mobileHistoryBtn" class="action-btn bg-indigo-600">
+            History
+          </button>
+          <button
+            id="mobileThemeBtn"
+            class="px-4 py-2 rounded-lg bg-slate-800 text-white"
+          >
+            🌙
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- Main Container -->
+
+    <main class="max-w-7xl mx-auto p-4">
+      <div
+        id="toast"
+        class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg hidden z-50"
+      ></div>
+      <section class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          Engineer Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label id="einLabel" class="form-label cursor-pointer">
+              EIN *
+            </label>
+
+            <input
+              id="ein"
+              type="text"
+              class="input-field"
+              required
+              maxlength="10"
+              placeholder="Numbers only"
+            />
+          </div>
+
+          <div>
+            <label id="ogeaLabel" class="form-label cursor-pointer">
+              OGEA *
+            </label>
+
+            <input
+              id="ogea"
+              value="OGEA"
+              type="text"
+              class="input-field uppercase"
+              required
+              maxlength="12"
+            />
+          </div>
+
+          <div>
+            <label class="form-label"> Engineer Name * </label>
+
+            <input id="name" type="text" class="input-field" required />
+          </div>
+        </div>
+
+        <!-- Divider -->
+
+        <div class="my-8 border-t border-slate-200"></div>
+
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          ONT Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label id="ontLabel" class="form-label cursor-pointer">
+              ONT Serial Number
+            </label>
+
+            <input id="ontSerial" type="text" class="input-field uppercase" />
+          </div>
+
+          <div>
+            <label id="spareOntLabel" class="form-label cursor-pointer">
+              Spare ONT
+            </label>
+
+            <input id="spareOnt" type="text" class="input-field uppercase" />
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="form-label"> Route </label>
+
+          <textarea
+            id="route"
+            rows="3"
+            class="input-field resize-none"
+          ></textarea>
+        </div>
+
+        <section
+          class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+        >
+          <h2 class="text-xl font-semibold mb-4 text-indigo-600">
+            Rough Work Area
+          </h2>
+
+          <textarea
+            id="roughWork"
+            rows="6"
+            placeholder="Temporary notes..."
+            class="input-field"
+          ></textarea>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div>
+            <label class="form-label"> Light Reading </label>
+
+            <input id="light" type="text" class="input-field" />
+          </div>
+
+          <div>
+            <label class="form-label"> Upstream </label>
+
+            <input id="upstream" type="text" class="input-field" />
+          </div>
+
+          <div>
+            <label class="form-label"> Downstream </label>
+
+            <input id="downstream" type="text" class="input-field" />
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          SASA Verification
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Correct Route -->
+
+          <div>
+            <label class="form-label"> Correct Route </label>
+
+            <textarea id="correctRoute" rows="3" class="input-field"></textarea>
+
+            <!-- <label class="form-label mt-3"> Correct SASA </label> -->
+
+            <!-- <input id="correctSasa" readonly class="input-field bg-slate-100" /> -->
+            <div>
+              <label class="form-label mt-3"> SASA 1 </label>
+              <input id="sasa_1" readonly class="input-field bg-slate-100" />
+            </div>
+          </div>
+
+          <!-- Incorrect Route -->
+
+          <div>
+            <label class="form-label"> Incorrect Route </label>
+
+            <textarea
+              id="incorrectRoute"
+              rows="3"
+              class="input-field"
+            ></textarea>
+
+            <!-- <label class="form-label mt-3"> Incorrect SASA </label>
+
+            <input
+              id="incorrectSasa"
+              readonly
+              class="input-field bg-slate-100"
+            /> -->
+            <div>
+              <label class="form-label mt-3"> SASA 2 </label>
+              <input id="sasa_2" readonly class="input-field bg-slate-100" />
+            </div>
+          </div>
+        </div>
+        <br />
+        <div>
+          <label class="form-label"> 2nd Line Reference </label>
+
+          <input id="reference" type="text" class="input-field" />
+        </div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <h2 class="text-xl font-semibold mb-4 text-indigo-600">
+          Generate Notes
+        </h2>
+
+        <div class="relative">
+          <label class="form-label"> Note Type </label>
+          <input
+            id="noteType"
+            type="text"
+            placeholder="Search note type..."
+            class="input-field"
+          />
+
+          <div
+            id="noteTypeDropdown"
+            class="hidden absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] max-h-48 overflow-y-auto"
+          ></div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 mt-6">
+          <button id="generateBtn" class="action-btn bg-indigo-600">
+            Generate Note
+          </button>
+
+          <button id="clearBtn" class="action-btn bg-slate-600">
+            Clear Form
+          </button>
+        </div>
+      </section>
+
+      <section
+        class="bg-orange-50 border-l-4 border-orange-500 rounded-2xl p-6 mt-6"
+      >
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-orange-600">Help Line Notes</h2>
+
+          <div class="flex space-x-2">
+            <button
+              id="openModalBtn"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button
+              id="toggleHelpBtn"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="helpContainer"
+          class="hidden mt-4 space-y-3 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg p-4 shadow"
+        ></div>
+
+        <div id="addContainer" class="mt-4 hidden"></div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-indigo-600">Generated Note</h2>
+
+          <span id="noteStatus" class="text-sm text-slate-500"> Ready </span>
+        </div>
+
+        <div
+          id="output"
+          contenteditable="false"
+          class="mt-4 min-h-[250px] bg-white rounded-xl border p-4 overflow-auto"
+        ></div>
+
+        <div class="flex flex-row gap-2 mt-4">
+          <button id="copyBtn" class="action-btn bg-blue-600 flex-1">
+            📋 Copy
+          </button>
+
+          <button id="editBtn" class="action-btn bg-amber-500 flex-1">
+            ✏️ Edit
+          </button>
+
+          <button id="saveBtn" class="action-btn bg-green-600 flex-1">
+            💾 Save
+          </button>
+        </div>
+      </section>
+
+      <!-- SPEED TABLE -->
+      <section class="bg-white rounded-3xl shadow-lg p-4 md:p-6 mt-6">
+        <div
+          class="flex justify-between items-center cursor-pointer"
+          id="speedTableToggle"
+        >
+          <div>
+            <h2 class="text-lg md:text-xl font-semibold text-indigo-600">
+              Speed Profile Table
+            </h2>
+
+            <p class="text-sm text-gray-500">Click to expand/collapse</p>
+          </div>
+
+          <button
+            id="speedTableArrow"
+            class="text-2xl transition-transform duration-300"
+          >
+            ▼
+          </button>
+        </div>
+
+        <!-- SEARCH -->
+        <div
+          id="speedTableWrapper"
+          class="max-h-0 overflow-y-auto transition-all duration-500 ease-in-out"
+        >
+          <div class="hidden md:block mt-4">
+            <input
+              type="text"
+              id="speedSearch"
+              placeholder="Search: 30-160..."
+              class="w-full border rounded-xl p-3"
+            />
+          </div>
+
+          <!-- TABLE -->
+          <div class="hidden md:block mt-4 rounded-xl border">
+            <table
+              id="speedTable"
+              class="w-full text-xs overflow-x-auto md:text-sm text-center [&_td]:px-3 [&_td]:py-3 [&_th]:px-3 [&_th]:py-3"
+            >
+              <!-- KEEP YOUR EXISTING TABLE HERE -->
+              <thead class="bg-indigo-600 text-white sticky top-0 z-10">
+                <tr class="bg-gray-300">
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Type
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Upstream Speed
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Downstream Speed
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Upstream Profile AMS ONT/DSLAM End
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Downstream Profile AMS  OHP Port
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">GFAST (Including SOGEA)</td>
+                  <td>30</td>
+                  <td>160</td>
+                  <td>GEAG_QSP_DSLAM_A_30Mp_30Mc</td>
+                  <td>GEAG_QSP_L2S_N_160Mp_110Mc</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">GFAST (Including SOGEA)</td>
+                  <td>50</td>
+                  <td>330</td>
+                  <td>GEAG_QSP_DSLAM_A_50Mp_50Mc</td>
+                  <td>GEAG_QSP_L2S_N_330Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>GEAP_BW_ONT_Up_500Ka</td>
+                  <td>GEAP_QSP_L2S_N_500Kp_500Kc</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>2</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_2Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>10</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_10Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>10</td>
+                  <td>55</td>
+                  <td>GEAP_BW_ONT_Up_10Ma</td>
+                  <td>GEAP_QSP_L2S_N_55Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>80</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_80Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>100</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_100Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>100</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_100Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>110</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_110Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>115</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_115Mp_55Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>160</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_160Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>220</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_220Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>220</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_220Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_40Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_40Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>50</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_50Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>165</td>
+                  <td>500</td>
+                  <td>GEAP_BW_ONT_Up_110Ma_165Mm</td>
+                  <td>GEAP_QSP_L2S_N_500Mp_220Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>75</td>
+                  <td>550</td>
+                  <td>GEAP_BW_ONT_Up_30Ma_75Mm</td>
+                  <td>GEAP_QSP_L2S_N_550Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>115</td>
+                  <td>1000</td>
+                  <td>GEAP_BW_ONT_Up_30Ma_115Mm</td>
+                  <td>GEAP_QSP_L2S_N_1000Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>220</td>
+                  <td>1000</td>
+                  <td>GEAP_BW_ONT_Up_110Ma_220Mm</td>
+                  <td>GEAP_QSP_L2S_N_1000Mp_</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>120</td>
+                  <td>1800</td>
+                  <td>GEAP_BW_ONT_Up_50Ma_120Mm</td>
+                  <td>GEAP_QSP_L2S_N_1800Mp_110Mc</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile Search -->
+          <div class="md:hidden mt-4">
+            <input
+              type="text"
+              id="speedCardSearch"
+              placeholder="Search: 30-160..."
+              class="w-full border rounded-xl p-3"
+            />
+          </div>
+
+          <!-- Mobile Cards -->
+          <div id="speedCards" class="md:hidden mt-4 space-y-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- HISTORY MODAL (ONLY ONE INSTANCE) -->
+    <div
+      id="historyModal"
+      class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-xl border dark:border-slate-700 overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-4 border-b bg-transparent dark:bg-slate-700 rounded-t-2xl"
+        >
+          <h2
+            class="text-xl font-semibold text-indigo-600 dark:text-indigo-400"
+          >
+            Saved Notes
+          </h2>
+          <button
+            id="closeHistoryBtn"
+            class="text-2xl hover:text-red-600 dark:hover:text-red-400"
+          >
+            ✖
+          </button>
+        </div>
+
+        <!-- Search + Sort -->
+        <div
+          class="flex items-center gap-3 p-4 border-b bg-transparent dark:bg-slate-700"
+        >
+          <div
+            class="flex items-center w-full rounded-lg px-3 py-2 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 transition"
+          >
+            <span class="text-gray-500 dark:text-slate-300 mr-2">🔍</span>
+            <input
+              id="historySearch"
+              type="text"
+              placeholder="Search EIN / OGEA / ONT..."
+              class="w-full bg-transparent outline-none text-slate-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-400"
+            />
+          </div>
+
+          <select
+            id="sortHistory"
+            class="border rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 border-gray-300 dark:border-slate-500"
+          >
+            <option value="recent">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+        </div>
+
+        <!-- Notes List (scrollable) -->
+        <div
+          id="historyList"
+          class="p-4 overflow-y-auto flex-1 space-y-3 bg-transparent text-slate-900 dark:text-slate-100"
+        ></div>
+
+        <!-- Sticky Footer -->
+        <div
+          class="p-4 border-t bg-transparent dark:bg-slate-700 rounded-b-2xl"
+        >
+          <button
+            id="deleteHistoryBtn"
+            class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-500"
+          >
+            🗑 Clear All History
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Template Modal -->
+    <div
+      id="templateModal"
+      class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] flex flex-col shadow-xl relative overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-5 border-b bg-gray-50 shrink-0"
+        >
+          <h2 class="text-2xl font-semibold text-indigo-600">
+            Manage Templates
+          </h2>
+          <button
+            id="closeTemplateBtn"
+            class="text-2xl font-bold hover:text-red-600 transition"
+          >
+            ✖
+          </button>
+        </div>
+
+        <!-- Body: Two Columns -->
+        <div class="flex-1 flex flex-col md:flex-row overflow-y-auto">
+          <!-- Left Column: Add/Edit Template -->
+          <div class="w-full md:w-1/2 p-5 border-r bg-gray-50 flex flex-col">
+            <input
+              id="templateName"
+              type="text"
+              placeholder="Template Name (e.g. Blank-Notes)"
+              class="w-full mb-3 border rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500"
+            />
+
+            <textarea
+              id="templateText"
+              placeholder="Enter template text..."
+              class="w-full border rounded-lg px-4 py-3 h-28 resize-none focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button
+                id="addTemplateBtn"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                ➕ Add Template
+              </button>
+              <button
+                id="previewTemplateBtn"
+                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
+                👁 Preview Template
+              </button>
+              <button
+                id="clearTemplateBtn"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                ❌ Cancle
+              </button>
+              <button
+                id="saveTemplateBtn"
+                class="hidden px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                💾 Save Template
+              </button>
+            </div>
+
+            <!-- Preview -->
+            <div
+              id="templatePreview"
+              class="hidden mt-4 p-4 border rounded-lg bg-white text-sm whitespace-pre-wrap flex-1 overflow-y-auto"
+            ></div>
+          </div>
+
+          <!-- Right Column: Search + List -->
+          <div class="w-full md:w-1/2 flex flex-col">
+            <!-- Heading + Count -->
+            <div class="flex items-center justify-between p-5 border-b bg-blue">
+              <h2 class="text-lg font-semibold text-indigo-600">
+                Template List
+              </h2>
+              <span
+                id="templateCount"
+                class="text-sm font-medium text-gray-500"
+              >
+                0 templates
+              </span>
+            </div>
+            <!-- Search + Stats -->
+            <div class="p-5 border-b bg-blue shrink-0">
+              <div class="flex items-center justify-between gap-3">
+                <input
+                  type="text"
+                  id="templateSearch"
+                  placeholder="🔍 Search by template name or content..."
+                  class="flex-1 border rounded-lg px-4 py-2"
+                />
+                <!-- Sort Dropdown -->
+                <select
+                  id="templateSort"
+                  class="border rounded-lg px-3 py-2 text-sm text-gray-600"
+                >
+                  <option value="recent">Recently Added</option>
+                  <option value="earlier">Earlier</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Template List -->
+            <div class="flex-1 overflow-y-auto">
+              <!-- ✅ changed here -->
+              <div
+                id="templateList"
+                class="p-5 space-y-4 bg-gray-50 rounded-lg"
+              >
+                <!-- Templates rendered here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+          class="p-4 border-t bg-gray-50 dark:bg-slate-800 flex flex-col gap-3 shrink-0"
+        >
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-3">
+            <button
+              id="clearTemplatesBtn"
+              class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              🗑 Clear All Templates
+            </button>
+            <button
+              id="resetTemplatesBtn"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              🔄 Reset Templates
+            </button>
+          </div>
+
+          <!-- Collapsible Help -->
+          <div class="border-t pt-3">
+            <button
+              id="footerHelpBtn"
+              class="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              ℹ️ How to Add Notes Template
+            </button>
+
+            <!-- ✅ Scrollable help content -->
+            <div
+              id="helpContent"
+              class="hidden mt-3 text-sm max-h-48 overflow-y-auto pr-2"
+            >
+              <p class="text-gray-600 dark:text-slate-300 mb-3">
+                Always use the correct placeholder syntax. Each placeholder must
+                be wrapped in double square brackets <code>[[ ]]</code>.
+                <strong>Important:</strong> Field names are
+                <span class="text-red-600 dark:text-red-400"
+                  >case‑sensitive</span
+                >. For example, <code>[[OGEA]]</code> works, but
+                <code>[[ogea]]</code> or <code>[[Ogea]]</code> will not.
+              </p>
+
+              <ul
+                class="list-disc pl-6 text-gray-700 dark:text-slate-200 space-y-1"
+              >
+                <li><strong>NAME:</strong> <code>[[NAME]]</code></li>
+                <li><strong>EIN:</strong> <code>[[EIN]]</code></li>
+                <li><strong>OGEA:</strong> <code>[[OGEA]]</code></li>
+                <li>
+                  <strong>ONT Serial:</strong> <code>[[ONT_SERIAL]]</code>
+                </li>
+                <li><strong>Spare ONT:</strong> <code>[[SPARE_ONT]]</code></li>
+                <li><strong>Route:</strong> <code>[[ROUTE]]</code></li>
+                <li><strong>Light Level:</strong> <code>[[LIGHT]]</code></li>
+                <li><strong>Reference:</strong> <code>[[REFERENCE]]</code></li>
+                <li>
+                  <strong>Downstream:</strong> <code>[[DOWNSTREAM]]</code>
+                </li>
+                <li><strong>Upstream:</strong> <code>[[UPSTREAM]]</code></li>
+                <li>
+                  <strong>Correct SASA:</strong> <code>[[CORRECT_SASA]]</code>
+                </li>
+                <li>
+                  <strong>Incorrect SASA:</strong>
+                  <code>[[INCORRECT_SASA]]</code>
+                </li>
+                <li><strong>SASA 1:</strong> <code>[[SASA_1]]</code></li>
+                <li><strong>SASA 2:</strong> <code>[[SASA_2]]</code></li>
+              </ul>
+
+              <p class="text-gray-600 dark:text-slate-300 mt-3">
+                ✅ Correct Example:
+                <br />
+                <code>
+                  Received a call from CSE [[NAME]] with EIN [[EIN]], working on
+                  [[OGEA]]. The ONT serial number is [[ONT_SERIAL]] for Route
+                  [[ROUTE]]. CSE confirmed that they are receiving a solid PON
+                  light and that all other services are functioning correctly.
+                </code>
+              </p>
+
+              <p class="text-red-600 dark:text-red-400 mt-2">
+                ❌ Incorrect: <code>[OGEA]</code> (missing one bracket) ❌
+                Incorrect: <code>[[ogea]]</code> (wrong case)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toast -->
+        <div
+          id="modalToast"
+          class="hidden absolute bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg z-50"
+        ></div>
+      </div>
+    </div>
+
+    <!-- ---Help-Notes Modal--- -->
+    <div
+      id="helpModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-2/3 p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-orange-600">Help Line Notes</h2>
+          <button onclick="closeModal()" class="text-gray-500 hover:text-black">
+            ✖
+          </button>
+        </div>
+
+        <!-- Notes list -->
+        <div id="helpList" class="space-y-3"></div>
+
+        <!-- Add new note -->
+        <div class="mt-4 flex">
+          <input
+            id="newNoteInput"
+            type="text"
+            class="border rounded-lg p-2 flex-grow"
+            placeholder="Enter new help note"
+          />
+          <button
+            onclick="addHelpNote()"
+            class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Progress Button -->
+    <button
+      id="scrollTopBtn"
+      class="hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full shadow-xl transition-all duration-300 hover:scale-110"
+    >
+      <svg
+        class="absolute inset-0 w-full h-full -rotate-90"
+        viewBox="0 0 100 100"
+      >
+        <!-- Background Ring -->
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          stroke="#e5e7eb"
+          stroke-width="8"
+          fill="none"
+        />
+
+        <!-- Progress Ring -->
+        <circle
+          id="progressCircle"
+          cx="50"
+          cy="50"
+          r="45"
+          stroke="#4f46e5"
+          stroke-width="8"
+          fill="none"
+          stroke-linecap="round"
+        />
+      </svg>
+
+      <div
+        id="scrollLabel"
+        class="absolute inset-2 flex items-center justify-center bg-indigo-600 text-white rounded-full text-xs font-bold"
+      >
+        0%
+      </div>
+    </button>
+    <script src="js/app.js"></script>
+  </body>
+</html>
