@@ -28,7 +28,7 @@ A modern web-based application designed to simplify FTTP troubleshooting note cr
 ### Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/fttp-notes-generator.git
+git clone https://github.com/abhijitchaudharii/fttp-notes-generator.git
 ```
 
 ### Open the project
