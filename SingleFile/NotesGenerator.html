@@ -1,0 +1,3218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>FTTP ES Notes</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      /* ==============================
+   GLOBAL DESIGN SYSTEM FIX
+============================== */
+
+      :root {
+        --card-bg: #ffffff;
+        --card-border: #e5e7eb;
+        --card-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        --card-hover: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --primary: #4f46e5;
+        --text: #0f172a;
+      }
+
+      body {
+        background: #f1f5f9;
+        font-family: Inter, sans-serif;
+      }
+
+      .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #334155;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        transition: 0.2s ease;
+      }
+
+      .card:hover {
+        box-shadow: var(--card-hover);
+        transform: translateY(-2px);
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        transition: all 0.2s ease;
+        background: white;
+      }
+
+      .input-field:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      }
+
+      .action-btn {
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      /* DARK MODE */
+
+      body.dark #helpContainer > div {
+        background-color: #1e293b !important; /* dark slate */
+        color: #f8fafc !important; /* light text */
+      }
+      body.dark #helpContainer > div:hover {
+        background-color: #334155 !important; /* slightly lighter on hover */
+      }
+
+      body.dark {
+        background: #0f172a !important;
+        color: #f8fafc;
+      }
+
+      body.dark header {
+        background: #1e293b !important;
+        border-color: #334155;
+      }
+
+      body.dark section {
+        background: #1e293b !important;
+        color: #f8fafc;
+      }
+
+      body.dark .form-label {
+        color: #e2e8f0;
+      }
+
+      body.dark .input-field {
+        background: #334155;
+        color: #f8fafc;
+        border-color: #475569;
+      }
+
+      body.dark .input-field::placeholder {
+        color: #94a3b8;
+      }
+
+      body.dark table {
+        color: #f8fafc;
+      }
+
+      body.dark tr.even\:bg-gray-100 {
+        background-color: #334155 !important;
+      }
+
+      body.dark h1,
+      body.dark h2 {
+        color: #818cf8 !important;
+      }
+
+      body.dark .card,
+      body.dark #templateList > div,
+      body.dark #historyList > div,
+      body.dark #helpContainer > div,
+      body.dark #helpList > div,
+      body.dark .speed-card {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+      }
+
+      body.dark #output {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+      }
+
+      body.dark #templateModal .bg-white,
+      body.dark #historyModal .bg-white {
+        background: #1e293b !important;
+      }
+      /* Global toast (page-wide) */
+      #toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #22c55e; /* green */
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      #toast.show {
+        opacity: 1;
+      }
+
+      /* Modal toast (scoped inside modal box) */
+      #modalToast {
+        position: absolute; /* anchors to modal container */
+        bottom: 20px;
+        right: 20px;
+        background-color: #22c55e; /* green */
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      #modalToast.show {
+        opacity: 1;
+      }
+
+      /* Editable output styling */
+      #output[contenteditable="true"] {
+        border: 2px solid #f59e0b;
+        background: #fffbeb;
+        outline: none;
+      }
+      body.dark #output {
+        background: #1e293b !important; /* dark slate */
+        color: #f8fafc !important; /* light text */
+        border-color: #334155 !important;
+      }
+
+      #output {
+        border-radius: 16px;
+        min-height: 260px;
+        padding: 16px;
+        font-family: "Inter", sans-serif;
+        line-height: 1.6;
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: var(--card-shadow);
+        transition: 0.2s;
+      }
+
+      #output:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      }
+
+      #templatePreview {
+        white-space: pre-line; /* collapses extra spaces but keeps line breaks */
+      }
+
+      /* History & Help cards */
+      #historyList > div,
+      #helpContainer > div,
+      #helpList > div {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 12px;
+        transition: 0.2s ease;
+      }
+
+      #historyList > div:hover,
+      #helpContainer > div:hover,
+      #helpList > div:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-hover);
+      }
+
+      /* Help modal scroll fix */
+      #helpModal .bg-white {
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 16px;
+      }
+
+      #templateModal .bg-white {
+        border-radius: 18px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+      }
+
+      #templateList > div {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 14px;
+        border: 1px solid #e5e7eb;
+        transition: 0.2s ease;
+      }
+
+      #templateList > div:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-hover);
+      }
+
+      #speedTable {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      #speedTable tbody tr {
+        transition: 0.2s;
+      }
+
+      #speedTable tbody tr:hover {
+        background: #eef2ff !important;
+      }
+      .speed-card {
+        border-radius: 14px;
+        transition: 0.2s ease;
+      }
+
+      .speed-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-hover);
+      }
+
+      /* Generic modal background fix */
+      .fixed.inset-0 {
+        backdrop-filter: blur(6px);
+      }
+
+      /* Modal box standard */
+      .fixed.inset-0 > div {
+        animation: pop 0.15s ease-in-out;
+      }
+
+      @keyframes pop {
+        from {
+          transform: scale(0.95);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      /* ------------------------- */
+
+      body.dark #speedTable input,
+      body.dark #speedSearch,
+      body.dark #speedTableSearch {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
+      }
+
+      body.dark #speedTable input::placeholder {
+        color: #94a3b8 !important;
+      }
+
+      body.dark #helpModal .bg-white {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155;
+      }
+
+      body.dark #helpModal input {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+      }
+      body.dark #templateModal .bg-white {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+      }
+      body.dark #templateModal .w-1\/3,
+      body.dark #templateModal .border-r {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+      }
+      body.dark #templateModal button {
+        color: #f8fafc !important;
+      }
+
+      body.dark #templateModal button:hover {
+        background: #334155 !important;
+      }
+
+      body.dark #templateModal .text-gray-500,
+      body.dark #templateModal .text-gray-400 {
+        color: #cbd5e1 !important;
+      }
+
+      body.dark #historyModal .bg-white {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155;
+      }
+
+      body.dark #historyModal input {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+      }
+
+      body.dark #historyModal input::placeholder {
+        color: #94a3b8 !important;
+      }
+      body.dark select,
+      body.dark option {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+      }
+
+      body.dark .dropdown,
+      body.dark ul,
+      body.dark li {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+      }
+      body.dark input,
+      body.dark textarea {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+      }
+
+      body.dark input::placeholder,
+      body.dark textarea::placeholder {
+        color: #94a3b8 !important;
+      }
+      body.dark #templateModal .w-1\/3 {
+        background: #0f172a !important;
+        border-right: 1px solid #334155 !important;
+      }
+      body.dark .overflow-y-auto {
+        background: transparent !important;
+      }
+
+      body.dark ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      body.dark ::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 10px;
+      }
+
+      body.dark .bg-white {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border-color: #334155 !important;
+      }
+
+      body.dark .bg-white,
+      body.dark .bg-gray-50,
+      body.dark .bg-gray-100 {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+      }
+
+      body.dark #templateModal .w-1\/3,
+      body.dark #templateModal .border-r {
+        background: #0f172a !important;
+      }
+
+      body.dark input[type="text"],
+      body.dark input[type="search"] {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+      }
+
+      body.dark input::placeholder {
+        color: #94a3b8 !important;
+      }
+
+      body.dark #templateModal h2,
+      body.dark #templateModal .text-gray-600,
+      body.dark #templateModal .text-gray-700 {
+        color: #f8fafc !important;
+      }
+
+      body.dark button svg {
+        color: #f8fafc !important;
+      }
+
+      body.dark .text-gray-500,
+      body.dark .text-gray-400 {
+        color: #cbd5e1 !important;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-100 dark:bg-slate-900 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-lg bg-white/70 border-b">
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <!-- Logo -->
+        <h1 class="text-xl md:text-3xl font-bold text-indigo-600">
+          FTTP ES Notes
+        </h1>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-2">
+          <button
+            id="openTemplateBtn"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            ➕ Add Template
+          </button>
+
+          <button
+            id="historyBtn"
+            class="px-4 py-2 action-btn bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            History
+          </button>
+          <button
+            id="themeToggle"
+            class="px-4 py-2 rounded-lg bg-slate-800 text-white"
+          >
+            🌙
+          </button>
+        </div>
+
+        <!-- Mobile Burger -->
+        <button id="menuBtn" class="md:hidden p-2 rounded-lg bg-slate-200">
+          ☰
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden px-4 pb-4">
+        <div class="flex flex-col gap-2">
+          <button id="mobileAddTemplateBtn" class="action-btn bg-indigo-600">
+            Add Template
+          </button>
+
+          <button id="mobileHistoryBtn" class="action-btn bg-indigo-600">
+            History
+          </button>
+          <button
+            id="mobileThemeBtn"
+            class="px-4 py-2 rounded-lg bg-slate-800 text-white"
+          >
+            🌙
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- Main Container -->
+
+    <main class="max-w-7xl mx-auto p-4">
+      <div
+        id="toast"
+        class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg hidden z-50"
+      ></div>
+      <section class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          Engineer Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label id="einLabel" class="form-label cursor-pointer">
+              EIN *
+            </label>
+
+            <input
+              id="ein"
+              type="text"
+              class="input-field"
+              required
+              maxlength="10"
+              placeholder="Numbers only"
+            />
+          </div>
+
+          <div>
+            <label id="ogeaLabel" class="form-label cursor-pointer">
+              OGEA *
+            </label>
+
+            <input
+              id="ogea"
+              value="OGEA"
+              type="text"
+              class="input-field uppercase"
+              required
+              maxlength="12"
+            />
+          </div>
+
+          <div>
+            <label class="form-label"> Engineer Name * </label>
+
+            <input id="name" type="text" class="input-field" required />
+          </div>
+        </div>
+
+        <!-- Divider -->
+
+        <div class="my-8 border-t border-slate-200"></div>
+
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          ONT Information
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label id="ontLabel" class="form-label cursor-pointer">
+              ONT Serial Number
+            </label>
+
+            <input id="ontSerial" type="text" class="input-field uppercase" />
+          </div>
+
+          <div>
+            <label id="spareOntLabel" class="form-label cursor-pointer">
+              Spare ONT
+            </label>
+
+            <input id="spareOnt" type="text" class="input-field uppercase" />
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="form-label"> Route </label>
+
+          <textarea
+            id="route"
+            rows="3"
+            class="input-field resize-none"
+          ></textarea>
+        </div>
+
+        <section
+          class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+        >
+          <h2 class="text-xl font-semibold mb-4 text-indigo-600">
+            Rough Work Area
+          </h2>
+
+          <textarea
+            id="roughWork"
+            rows="6"
+            placeholder="Temporary notes..."
+            class="input-field"
+          ></textarea>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div>
+            <label class="form-label"> Light Reading </label>
+
+            <input id="light" type="text" class="input-field" />
+          </div>
+
+          <div>
+            <label class="form-label"> Upstream </label>
+
+            <input id="upstream" type="text" class="input-field" />
+          </div>
+
+          <div>
+            <label class="form-label"> Downstream </label>
+
+            <input id="downstream" type="text" class="input-field" />
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <h2 class="text-xl font-semibold mb-6 text-indigo-600">
+          SASA Verification
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Correct Route -->
+
+          <div>
+            <label class="form-label"> Correct Route </label>
+
+            <textarea id="correctRoute" rows="3" class="input-field"></textarea>
+
+            <!-- <label class="form-label mt-3"> Correct SASA </label> -->
+
+            <!-- <input id="correctSasa" readonly class="input-field bg-slate-100" /> -->
+            <div>
+              <label class="form-label mt-3"> SASA 1 </label>
+              <input id="sasa_1" readonly class="input-field bg-slate-100" />
+            </div>
+          </div>
+
+          <!-- Incorrect Route -->
+
+          <div>
+            <label class="form-label"> Incorrect Route </label>
+
+            <textarea
+              id="incorrectRoute"
+              rows="3"
+              class="input-field"
+            ></textarea>
+
+            <!-- <label class="form-label mt-3"> Incorrect SASA </label>
+
+            <input
+              id="incorrectSasa"
+              readonly
+              class="input-field bg-slate-100"
+            /> -->
+            <div>
+              <label class="form-label mt-3"> SASA 2 </label>
+              <input id="sasa_2" readonly class="input-field bg-slate-100" />
+            </div>
+          </div>
+        </div>
+        <br />
+        <div>
+          <label class="form-label"> 2nd Line Reference </label>
+
+          <input id="reference" type="text" class="input-field" />
+        </div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <h2 class="text-xl font-semibold mb-4 text-indigo-600">
+          Generate Notes
+        </h2>
+
+        <div class="relative">
+          <label class="form-label"> Note Type </label>
+          <input
+            id="noteType"
+            type="text"
+            placeholder="Search note type..."
+            class="input-field"
+          />
+
+          <div
+            id="noteTypeDropdown"
+            class="hidden absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] max-h-48 overflow-y-auto"
+          ></div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 mt-6">
+          <button id="generateBtn" class="action-btn bg-indigo-600">
+            Generate Note
+          </button>
+
+          <button id="clearBtn" class="action-btn bg-slate-600">
+            Clear Form
+          </button>
+        </div>
+      </section>
+
+      <section
+        class="bg-orange-50 border-l-4 border-orange-500 rounded-2xl p-6 mt-6"
+      >
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-orange-600">Help Line Notes</h2>
+
+          <div class="flex space-x-2">
+            <button
+              id="openModalBtn"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button
+              id="toggleHelpBtn"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="helpContainer"
+          class="hidden mt-4 space-y-3 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg p-4 shadow"
+        ></div>
+
+        <div id="addContainer" class="mt-4 hidden"></div>
+      </section>
+
+      <section
+        class="bg-white/70 backdrop-blur-lg rounded-3xl shadow-lg p-6 mt-6"
+      >
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-indigo-600">Generated Note</h2>
+
+          <span id="noteStatus" class="text-sm text-slate-500"> Ready </span>
+        </div>
+
+        <div
+          id="output"
+          contenteditable="false"
+          class="mt-4 min-h-[250px] bg-white rounded-xl border p-4 overflow-auto"
+        ></div>
+
+        <div class="flex flex-row gap-2 mt-4">
+          <button id="copyBtn" class="action-btn bg-blue-600 flex-1">
+            📋 Copy
+          </button>
+
+          <button id="editBtn" class="action-btn bg-amber-500 flex-1">
+            ✏️ Edit
+          </button>
+
+          <button id="saveBtn" class="action-btn bg-green-600 flex-1">
+            💾 Save
+          </button>
+        </div>
+      </section>
+
+      <!-- SPEED TABLE -->
+      <section class="bg-white rounded-3xl shadow-lg p-4 md:p-6 mt-6">
+        <div
+          class="flex justify-between items-center cursor-pointer"
+          id="speedTableToggle"
+        >
+          <div>
+            <h2 class="text-lg md:text-xl font-semibold text-indigo-600">
+              Speed Profile Table
+            </h2>
+
+            <p class="text-sm text-gray-500">Click to expand/collapse</p>
+          </div>
+
+          <button
+            id="speedTableArrow"
+            class="text-2xl transition-transform duration-300"
+          >
+            ▼
+          </button>
+        </div>
+
+        <!-- SEARCH -->
+        <div
+          id="speedTableWrapper"
+          class="max-h-0 overflow-y-auto transition-all duration-500 ease-in-out"
+        >
+          <div class="hidden md:block mt-4">
+            <input
+              type="text"
+              id="speedSearch"
+              placeholder="Search: 30-160..."
+              class="w-full border rounded-xl p-3"
+            />
+          </div>
+
+          <!-- TABLE -->
+          <div class="hidden md:block mt-4 rounded-xl border">
+            <table
+              id="speedTable"
+              class="w-full text-xs overflow-x-auto md:text-sm text-center [&_td]:px-3 [&_td]:py-3 [&_th]:px-3 [&_th]:py-3"
+            >
+              <!-- KEEP YOUR EXISTING TABLE HERE -->
+              <thead class="bg-indigo-600 text-white sticky top-0 z-10">
+                <tr class="bg-gray-300">
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Type
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Upstream Speed
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Downstream Speed
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Upstream Profile AMS ONT/DSLAM End
+                  </th>
+                  <th class="px-3 py-3 text-center bg-indigo-600 text-white">
+                    Downstream Profile AMS  OHP Port
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">GFAST (Including SOGEA)</td>
+                  <td>30</td>
+                  <td>160</td>
+                  <td>GEAG_QSP_DSLAM_A_30Mp_30Mc</td>
+                  <td>GEAG_QSP_L2S_N_160Mp_110Mc</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">GFAST (Including SOGEA)</td>
+                  <td>50</td>
+                  <td>330</td>
+                  <td>GEAG_QSP_DSLAM_A_50Mp_50Mc</td>
+                  <td>GEAG_QSP_L2S_N_330Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>GEAP_BW_ONT_Up_500Ka</td>
+                  <td>GEAP_QSP_L2S_N_500Kp_500Kc</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>2</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_2Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>10</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_10Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>40</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_40Mp_15Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>10</td>
+                  <td>55</td>
+                  <td>GEAP_BW_ONT_Up_10Ma</td>
+                  <td>GEAP_QSP_L2S_N_55Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>80</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_80Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>100</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_100Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>100</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_100Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>15</td>
+                  <td>110</td>
+                  <td>GEAP_BW_ONT_Up_15Ma</td>
+                  <td>GEAP_QSP_L2S_N_110Mp_20Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>115</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_115Mp_55Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>160</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_160Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>220</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_220Mp_30Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>220</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_220Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>20</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_20Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_40Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>30</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_30Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_40Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>50</td>
+                  <td>330</td>
+                  <td>GEAP_BW_ONT_Up_50Ma</td>
+                  <td>GEAP_QSP_L2S_N_330Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>165</td>
+                  <td>500</td>
+                  <td>GEAP_BW_ONT_Up_110Ma_165Mm</td>
+                  <td>GEAP_QSP_L2S_N_500Mp_220Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>75</td>
+                  <td>550</td>
+                  <td>GEAP_BW_ONT_Up_30Ma_75Mm</td>
+                  <td>GEAP_QSP_L2S_N_550Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>115</td>
+                  <td>1000</td>
+                  <td>GEAP_BW_ONT_Up_30Ma_115Mm</td>
+                  <td>GEAP_QSP_L2S_N_1000Mp_110Mc</td>
+                </tr>
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>220</td>
+                  <td>1000</td>
+                  <td>GEAP_BW_ONT_Up_110Ma_220Mm</td>
+                  <td>GEAP_QSP_L2S_N_1000Mp_</td>
+                </tr>
+
+                <tr class="even:bg-gray-100 hover:bg-indigo-50">
+                  <td class="px-3 py-3 text-center">FTTP</td>
+                  <td>120</td>
+                  <td>1800</td>
+                  <td>GEAP_BW_ONT_Up_50Ma_120Mm</td>
+                  <td>GEAP_QSP_L2S_N_1800Mp_110Mc</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile Search -->
+          <div class="md:hidden mt-4">
+            <input
+              type="text"
+              id="speedCardSearch"
+              placeholder="Search: 30-160..."
+              class="w-full border rounded-xl p-3"
+            />
+          </div>
+
+          <!-- Mobile Cards -->
+          <div id="speedCards" class="md:hidden mt-4 space-y-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- HISTORY MODAL (ONLY ONE INSTANCE) -->
+    <div
+      id="historyModal"
+      class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-xl border dark:border-slate-700 overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-4 border-b bg-transparent dark:bg-slate-700 rounded-t-2xl"
+        >
+          <h2
+            class="text-xl font-semibold text-indigo-600 dark:text-indigo-400"
+          >
+            Saved Notes
+          </h2>
+          <button
+            id="closeHistoryBtn"
+            class="text-2xl hover:text-red-600 dark:hover:text-red-400"
+          >
+            ✖
+          </button>
+        </div>
+
+        <!-- Search + Sort -->
+        <div
+          class="flex items-center gap-3 p-4 border-b bg-transparent dark:bg-slate-700"
+        >
+          <div
+            class="flex items-center w-full rounded-lg px-3 py-2 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 transition"
+          >
+            <span class="text-gray-500 dark:text-slate-300 mr-2">🔍</span>
+            <input
+              id="historySearch"
+              type="text"
+              placeholder="Search EIN / OGEA / ONT..."
+              class="w-full bg-transparent outline-none text-slate-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-400"
+            />
+          </div>
+
+          <select
+            id="sortHistory"
+            class="border rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 border-gray-300 dark:border-slate-500"
+          >
+            <option value="recent">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+        </div>
+
+        <!-- Notes List (scrollable) -->
+        <div
+          id="historyList"
+          class="p-4 overflow-y-auto flex-1 space-y-3 bg-transparent text-slate-900 dark:text-slate-100"
+        ></div>
+
+        <!-- Sticky Footer -->
+        <div
+          class="p-4 border-t bg-transparent dark:bg-slate-700 rounded-b-2xl"
+        >
+          <button
+            id="deleteHistoryBtn"
+            class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-500"
+          >
+            🗑 Clear All History
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Template Modal -->
+    <div
+      id="templateModal"
+      class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] flex flex-col shadow-xl relative overflow-hidden"
+      >
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-5 border-b bg-gray-50 shrink-0"
+        >
+          <h2 class="text-2xl font-semibold text-indigo-600">
+            Manage Templates
+          </h2>
+          <button
+            id="closeTemplateBtn"
+            class="text-2xl font-bold hover:text-red-600 transition"
+          >
+            ✖
+          </button>
+        </div>
+
+        <!-- Body: Two Columns -->
+        <div class="flex-1 flex flex-col md:flex-row overflow-y-auto">
+          <!-- Left Column: Add/Edit Template -->
+          <div class="w-full md:w-1/2 p-5 border-r bg-gray-50 flex flex-col">
+            <input
+              id="templateName"
+              type="text"
+              placeholder="Template Name (e.g. Blank-Notes)"
+              class="w-full mb-3 border rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500"
+            />
+            <!-- Quick Insert Toolbar -->
+            <div id="toolbar" class="flex flex-wrap gap-2 mb-3"></div>
+
+            <textarea
+              id="templateText"
+              placeholder="Enter template text..."
+              class="w-full border rounded-lg px-4 py-3 h-28 resize-none focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+            <!-- Validation output -->
+            <div id="validationHints" class="mt-2 text-sm"></div>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button
+                id="addTemplateBtn"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                ➕ Add Template
+              </button>
+              <button
+                id="previewTemplateBtn"
+                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
+                👁 Preview Template
+              </button>
+              <button
+                id="clearTemplateBtn"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                ❌ Cancle
+              </button>
+              <button
+                id="saveTemplateBtn"
+                class="hidden px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                💾 Save Template
+              </button>
+            </div>
+
+            <!-- Preview -->
+            <div
+              id="templatePreview"
+              class="hidden mt-4 p-4 border rounded-lg bg-white text-sm whitespace-pre-wrap flex-1 overflow-y-auto"
+            ></div>
+          </div>
+
+          <!-- Right Column: Search + List -->
+          <div class="w-full md:w-1/2 flex flex-col">
+            <!-- Heading + Count -->
+            <div class="flex items-center justify-between p-5 border-b bg-blue">
+              <h2 class="text-lg font-semibold text-indigo-600">
+                Template List
+              </h2>
+              <span
+                id="templateCount"
+                class="text-sm font-medium text-gray-500"
+              >
+                0 templates
+              </span>
+            </div>
+            <!-- Search + Stats -->
+            <div class="p-5 border-b bg-blue shrink-0">
+              <div class="flex items-center justify-between gap-3">
+                <input
+                  type="text"
+                  id="templateSearch"
+                  placeholder="🔍 Search by template name or content..."
+                  class="flex-1 border rounded-lg px-4 py-2"
+                />
+                <!-- Sort Dropdown -->
+                <select
+                  id="templateSort"
+                  class="border rounded-lg px-3 py-2 text-sm text-gray-600"
+                >
+                  <option value="recent">Recently Added</option>
+                  <option value="earlier">Earlier</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Template List -->
+            <div class="flex-1 overflow-y-auto">
+              <!-- ✅ changed here -->
+              <div
+                id="templateList"
+                class="p-5 space-y-4 bg-gray-50 rounded-lg"
+              >
+                <!-- Templates rendered here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+          class="p-4 border-t bg-gray-50 dark:bg-slate-800 flex flex-col gap-3 shrink-0"
+        >
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-3">
+            <button
+              id="clearTemplatesBtn"
+              class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              🗑 Clear All Templates
+            </button>
+            <button
+              id="resetTemplatesBtn"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              🔄 Reset Templates
+            </button>
+          </div>
+
+          <!-- Collapsible Help -->
+          <div class="border-t pt-3">
+            <button
+              id="footerHelpBtn"
+              class="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              ℹ️ How to Add Notes Template
+            </button>
+
+            <!-- ✅ Scrollable help content -->
+            <div
+              id="helpContent"
+              class="hidden mt-3 text-sm max-h-48 overflow-y-auto pr-2"
+            >
+              <p class="text-gray-600 dark:text-slate-300 mb-3">
+                Always use the correct placeholder syntax. Each placeholder must
+                be wrapped in double square brackets <code>[[ ]]</code>.
+                <strong>Important:</strong> Field names are
+                <span class="text-red-600 dark:text-red-400"
+                  >case‑sensitive</span
+                >. For example, <code>[[OGEA]]</code> works, but
+                <code>[[ogea]]</code> or <code>[[Ogea]]</code> will not.
+              </p>
+
+              <ul
+                class="list-disc pl-6 text-gray-700 dark:text-slate-200 space-y-1"
+              >
+                <li><strong>NAME:</strong> <code>[[NAME]]</code></li>
+                <li><strong>EIN:</strong> <code>[[EIN]]</code></li>
+                <li><strong>OGEA:</strong> <code>[[OGEA]]</code></li>
+                <li>
+                  <strong>ONT Serial:</strong> <code>[[ONT_SERIAL]]</code>
+                </li>
+                <li><strong>Spare ONT:</strong> <code>[[SPARE_ONT]]</code></li>
+                <li><strong>Route:</strong> <code>[[ROUTE]]</code></li>
+                <li><strong>Light Level:</strong> <code>[[LIGHT]]</code></li>
+                <li><strong>Reference:</strong> <code>[[REFERENCE]]</code></li>
+                <li>
+                  <strong>Downstream:</strong> <code>[[DOWNSTREAM]]</code>
+                </li>
+                <li><strong>Upstream:</strong> <code>[[UPSTREAM]]</code></li>
+                <li>
+                  <strong>Correct SASA:</strong> <code>[[CORRECT_SASA]]</code>
+                </li>
+                <li>
+                  <strong>Incorrect SASA:</strong>
+                  <code>[[INCORRECT_SASA]]</code>
+                </li>
+                <li><strong>SASA 1:</strong> <code>[[SASA_1]]</code></li>
+                <li><strong>SASA 2:</strong> <code>[[SASA_2]]</code></li>
+              </ul>
+
+              <p class="text-gray-600 dark:text-slate-300 mt-3">
+                ✅ Correct Example:
+                <br />
+                <code>
+                  Received a call from CSE [[NAME]] with EIN [[EIN]], working on
+                  [[OGEA]]. The ONT serial number is [[ONT_SERIAL]] for Route
+                  [[ROUTE]]. CSE confirmed that they are receiving a solid PON
+                  light and that all other services are functioning correctly.
+                </code>
+              </p>
+
+              <p class="text-red-600 dark:text-red-400 mt-2">
+                ❌ Incorrect: <code>[OGEA]</code> (missing one bracket) ❌
+                Incorrect: <code>[[ogea]]</code> (wrong case)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toast -->
+        <div
+          id="modalToast"
+          class="hidden absolute bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg z-50"
+        ></div>
+      </div>
+    </div>
+
+    <!-- ---Help-Notes Modal--- -->
+    <div
+      id="helpModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    >
+      <div class="bg-white rounded-lg shadow-lg w-2/3 p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-orange-600">Help Line Notes</h2>
+          <button onclick="closeModal()" class="text-gray-500 hover:text-black">
+            ✖
+          </button>
+        </div>
+
+        <!-- Notes list -->
+        <div id="helpList" class="space-y-3"></div>
+
+        <!-- Add new note -->
+        <div class="mt-4 flex">
+          <input
+            id="newNoteInput"
+            type="text"
+            class="border rounded-lg p-2 flex-grow"
+            placeholder="Enter new help note"
+          />
+          <button
+            onclick="addHelpNote()"
+            class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Progress Button -->
+    <button
+      id="scrollTopBtn"
+      class="hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full shadow-xl transition-all duration-300 hover:scale-110"
+    >
+      <svg
+        class="absolute inset-0 w-full h-full -rotate-90"
+        viewBox="0 0 100 100"
+      >
+        <!-- Background Ring -->
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          stroke="#e5e7eb"
+          stroke-width="8"
+          fill="none"
+        />
+
+        <!-- Progress Ring -->
+        <circle
+          id="progressCircle"
+          cx="50"
+          cy="50"
+          r="45"
+          stroke="#4f46e5"
+          stroke-width="8"
+          fill="none"
+          stroke-linecap="round"
+        />
+      </svg>
+
+      <div
+        id="scrollLabel"
+        class="absolute inset-2 flex items-center justify-center bg-indigo-600 text-white rounded-full text-xs font-bold"
+      >
+        0%
+      </div>
+    </button>
+    <script>
+      document.addEventListener("DOMContentLoaded", init);
+
+      // .............Auto SASA.............
+
+      const templateList = [
+        { group: "Group 1", path: "shelf=0/slot=5/sub_slot=3", sasa: "SASA 1" },
+
+        { group: "Group 2", path: "shelf=0/slot=5/sub_slot=1", sasa: "SASA 1" },
+
+        { group: "Group 2", path: "shelf=0/slot=5/sub_slot=2", sasa: "SASA 2" },
+
+        { group: "Group 3", path: "shelf=0/slot=5/sub_slot=4", sasa: "SASA 1" },
+
+        { group: "Group 3", path: "shelf=0/slot=5/sub_slot=5", sasa: "SASA 2" },
+
+        { group: "Group 4", path: "shelf=0/slot=1/sub_slot=2", sasa: "SASA 1" },
+
+        { group: "Group 4", path: "shelf=0/slot=1/sub_slot=3", sasa: "SASA 2" },
+
+        { group: "Group 4", path: "shelf=1/slot=1/sub_slot=2", sasa: "SASA 3" },
+
+        { group: "Group 4", path: "shelf=1/slot=1/sub_slot=3", sasa: "SASA 4" },
+
+        {
+          group: "Group 5",
+          path: "shelf=0/slot=1/sub_slot=4/port=1",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 5",
+          path: "shelf=0/slot=1/sub_slot=5/port=1",
+          sasa: "SASA 2",
+        },
+
+        {
+          group: "Group 5",
+          path: "shelf=1/slot=1/sub_slot=4/port=1",
+          sasa: "SASA 3",
+        },
+
+        {
+          group: "Group 5",
+          path: "shelf=1/slot=1/sub_slot=5/port=1",
+          sasa: "SASA 4",
+        },
+
+        { group: "Group 6", path: "shelf=0/slot=45", sasa: "SASA 1 A side" },
+
+        { group: "Group 6", path: "shelf=1/slot=45", sasa: "SASA 2 B side" },
+
+        { group: "Group 6", path: "shelf=0/slot=47", sasa: "SASA 3 A side" },
+
+        { group: "Group 6", path: "shelf=1/slot=47", sasa: "SASA 4 B side" },
+
+        { group: "Group 7", path: "shelf=0/slot=19", sasa: "SASA 1 A side" },
+
+        { group: "Group 7", path: "shelf=0/slot=24", sasa: "SASA 2 A side" },
+
+        { group: "Group 7", path: "shelf=0/slot=29", sasa: "SASA 3 A side" },
+
+        { group: "Group 7", path: "shelf=0/slot=34", sasa: "SASA 4 A side" },
+
+        { group: "Group 8", path: "shelf=0/slot=6", sasa: "SASA 1 A side" },
+
+        { group: "Group 8", path: "shelf=1/slot=6", sasa: "SASA 2 B side" },
+
+        { group: "Group 8", path: "shelf=0/slot=7", sasa: "SASA 3 A side" },
+
+        { group: "Group 8", path: "shelf=1/slot=7", sasa: "SASA 4 B side" },
+
+        {
+          group: "Group 9",
+          path: "shelf=0/slot=1/sub_slot=1/port=1",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 9",
+          path: "shelf=0/slot=1/sub_slot=1/port=2",
+          sasa: "SASA 2",
+        },
+
+        {
+          group: "Group 9",
+          path: "shelf=0/slot=13/sub_slot=1/port=1",
+          sasa: "SASA 2",
+        },
+
+        {
+          group: "Group 9",
+          path: "shelf=0/slot=1/sub_slot=1/port=3",
+          sasa: "SASA 3",
+        },
+
+        {
+          group: "Group 9",
+          path: "shelf=1/slot=1/sub_slot=1/port=1",
+          sasa: "SASA 3",
+        },
+
+        {
+          group: "Group 9",
+          path: "shelf=1/slot=13/sub_slot=1/port=1",
+          sasa: "SASA 4",
+        },
+
+        { group: "Group 10", path: "shelf=0/slot=6", sasa: "SASA 1" },
+
+        {
+          group: "Group 11",
+          path: "shelf=0/slot=3/sub_slot=4",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 12",
+          path: "shelf=0/slot=13/sub_slot=4",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 12",
+          path: "shelf=0/slot=13/sub_slot=5",
+          sasa: "SASA 2",
+        },
+
+        {
+          group: "Group 12",
+          path: "shelf=1/slot=13/sub_slot=4",
+          sasa: "SASA 3",
+        },
+
+        {
+          group: "Group 12",
+          path: "shelf=1/slot=13/sub_slot=5",
+          sasa: "SASA 4",
+        },
+
+        { group: "Group 12", path: "na", sasa: "na" },
+
+        {
+          group: "Group 13",
+          path: "shelf=0/slot=1/sub_slot=6",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 14",
+          path: "shelf=0/slot=3/sub_slot=1/port=1",
+          sasa: "SASA 1",
+        },
+
+        { group: "Group 14", path: "Single SASA Splitter", sasa: "SASA n/a" },
+
+        {
+          group: "Group 15",
+          path: "shelf=0/slot=19/sub_slot=1/port=1",
+          sasa: "SASA 1",
+        },
+
+        {
+          group: "Group 15",
+          path: "shelf=0/slot=19/sub_slot=1/port=3",
+          sasa: "SASA 2",
+        },
+
+        { group: "Group 20", path: "test", sasa: "SASA 1" },
+
+        { group: "Group 20", path: "test", sasa: "SASA 1" },
+      ];
+
+      function initTemplates() {
+        const stored = JSON.parse(localStorage.getItem("noteTemplates")) || [];
+
+        // Define your default hard-coded templates
+        const defaultTemplates = [
+          {
+            name: "Blank-Notes",
+            text: "Received a call from CSE [[NAME]] with EIN:- [[EIN]], working on [[OGEA]]. The ONT serial number is [[ONT_SERIAL]] for [Route: [ROUTE]] CSE confirmed that they are receiving a solid PON light and that all other services are functioning correctly.",
+          },
+          {
+            name: "ONT Activation",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN:- [[EIN]], working on [[OGEA]]. The ONT serial number is [[ONT_SERIAL]]. CSE contacted us for ONT activation. V21 was activated for [[ROUTE]], and the circuit was built automatically. CSE confirmed that they are receiving a solid PON light and that all other services are functioning correctly.",
+          },
+          {
+            name: "Flashing PON V21 Activation",
+            text: "DCoE Note: Received call from CSE:-[[NAME]] with EIN:-[[EIN]] working on [[OGEA]], CSE has scanned the ONT serial no:-[[ONT_SERIAL]] but facing flashing PON light on [[ROUTE]] checked the milestone for V21 was not initiated, so initiated V21 and the circuit got built automatically. CSE confirmed he is getting solid PON light, and all the other services are working fine as well.",
+          },
+          {
+            name: "Flashing PON",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]] , working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Upon checking, the milestone for V21 had already been initiated, and there were no open exceptions. The ONT serial number and services were correctly built on the EMS, but the ONT was not discovering on a different route. The ranging was correct in the EMS, and the light level at the ONT was [[LIGHT]]. CSE then tried a different ONT with serial number [[SPARE_ONT]], but the flashing PON issue persisted. The old ONT serial number was updated back, and as per the wiki guidelines, the CSE was advised that this is a one-way light issue, likely caused by a damaged lead-in. Consequently, the CSE was advised to investigate the network.",
+          },
+          {
+            name: "Flashing PON Incorrect ONT S/N",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Upon checking, the milestone for V21 had already been initiated, and there were no open exceptions. Accessed the EMS and found that an incorrect ONT serial number [[SPARE_ONT]] was present on the route. Updated the correct ONT serial number in both EMS and SRIMs. CSE confirmed a solid PON light, and all other services are functioning correctly.",
+          },
+          {
+            name: "ONT S/N Change",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], regarding an ONT change on [[ROUTE]] with new ONT S/N [[ONT_SERIAL]]. Accessed EMS and found the old ONT S/N [[SPARE_ONT]] was still present. Updated the correct ONT S/N in EMS and SRIMs. CSE confirmed a solid PON light, and all other services are functioning correctly.",
+          },
+          {
+            name: "In Course of Re-route for Provision Job",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light due to a CBT re-route on [[ROUTE]]. In SRIMS, it was in the course of re-route, and the circuit had been built as per the old CBT route. Deleted the previous circuit and initiated the V21 milestone. The circuit was built automatically on the correct route as per SRIMS. CSE confirmed a solid PON light and services on the router.",
+          },
+          {
+            name: "In Course of Re-route for Repair Job",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light due to a CBT re-route on [[ROUTE]]. In SRIMS, it was in the course of re-route, and the circuit had been built as per the old CBT route. Deleted the previous circuit and manually built the circuit on the correct route as per SRIMS. CSE confirmed a solid PON light and services on the router.",
+          },
+          {
+            name: "Mis-Route/Incorrect SASA",
+            text: `DCoE Notes: Received a call from CSE [[NAME]] with EIN:- [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Checked the circuit, which was built as per SRIMS, but the light was reflecting on a different GPON.
+
+Correct Route: [[SASA_1]]
+
+[[CORRECT_SASA]]
+
+Incorrect Route: [[SASA_2]]
+
+[[INCORRECT_SASA]]
+
+Advised the CSE about the light coming on a different GPON and requested to raise a fusion for an N11 engineer.`,
+          },
+          {
+            name: "Re-Route",
+            text: `DCoE Notes: Received a call from CSE [[NAME]] with EIN:- [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Checked the circuit, which was built as per SRIMS, but the light was reflecting on a different GPON.
+
+Correct Route: [[SASA_1]]
+
+[[CORRECT_SASA]]
+
+Required Route: [[SASA_2]]
+
+[[INCORRECT_SASA]]
+
+Advised the CSE about the light coming on a different GPON and transferred the call to the 2nd line with 2nd line form with reference [[Reference]].`,
+          },
+
+          {
+            name: "Line is either not configured in EMS or multiple discrepancies identified between EMS and SRIMS",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], reporting that the line is either not configured in EMS or there are multiple discrepancies identified between EMS and SRIMS on [[ROUTE]]. Upon investigation, found that there was a different ONT serial number [[SPARE_ONT]] in SRIMS and EMS. Updated the correct details in the SRIMS application and performed a line test, which passed with no problems found. CSE also confirmed the same.",
+          },
+          {
+            name: "EMS CP tags configuration fail",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], reporting an EMS CP tags configuration issue on [[ROUTE]]. Accessed EMS and found missing builds. Manually built the circuit, and CSE confirmed a solid PON light, and all other services were functioning correctly.",
+          },
+          {
+            name: "Testing indicates a problem with the headend handover port status on EMS with Error code 1713",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]],reporting that testing indicates a problem with the headend handover port status on EMS with Error Code 1713. Accessed the EMS and checked the builds, which were correct. As per the wiki guidelines, transferred the call to the 2nd line (Adtran Support) with a 2nd line form reference [[REFERENCE]].",
+          },
+          {
+            name: "Two Services on same NAD key",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], but was not receiving services on the router. Checked and found no open exceptions. Located the [[ROUTE]] from EMS and found missing builds. Tried to manually build the circuit but was unable to due to two services on the same NAD key, while the customer had only one service. Advised the CSE to inform the customer to contact the service provider and cease one service.",
+          },
+          {
+            name: "Slow Speeds",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], reporting slow speeds on [[ROUTE]]. CSE confirmed downstream bandwidth as [[DOWNSTREAM]]Mbit/s and upstream bandwidth as [[UPSTREAM]]Mbit/s. Checked and found the ONT port was in sync with the correct serial number and had a good light reading of [[LIGHT]]. Builds were correct with no alarms. Requested the CSE to change the Ethernet cable and clean the connector into the ONT. CSE reported still experiencing slow speeds. Changed the ONT with [[SPARE_ONT]], and once the software was updated, requested the CSE to perform a test with a laptop (VPN switched off), with a wired connection to the hub, with nothing else connected to the hub. CSE performed a throughput test from [www.speedtest.net], but the results were not greater than two-thirds of the sync speed, and the CSE still reported downstream bandwidth as [[DOWNSTREAM]]Mbit/s and upstream bandwidth as [[UPSTREAM]]Mbit/s. As per the wiki guidelines, transferred the call to the 2nd line with 2nd line form with reference [[REFERENCE]].",
+          },
+          {
+            name: "No web pages",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], reporting an inability to load any web pages on any device. Checked and found no open exceptions. The EU router showed the correct lights, but no web pages could be obtained. Located the [[ROUTE]] from EMS and confirmed the port was in sync with the correct ONT serial number and had a good light reading of [[LIGHT]]. Checked that the ONT software was updated. Performed a woosh line test, which passed with no problems found. Checked the builds in EMS, which were correct. Advised the CSE to check the web pages on an alternative device, but the issue persisted. As per the wiki guidelines, transferred the call to the 2nd line with 2nd line form with reference [[REFERENCE]].",
+          },
+          {
+            name: "Nokia GHOST BUILDS",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], but was not receiving services on the router. Checked and found no open exceptions. Located the [[ROUTE]] from EMS and found missing builds. So Tried to manually build the circuit but was unable to build it, because entry already exist. So checked in background but found ghost data present there, so as per WIKI guidelines transferred call to Nokia Support. - with reference [[REFERENCE]]",
+          },
+          {
+            name: "MANUAL BUILDS NOTES",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONTSERIAL]] but encountered a flashing PON light on [[ROUTE]]. Upon checking, the milestone for V21 had already been initiated, and there were no open exceptions. Accessed the EMS and found that builds were missing, so manually build the circuit. CSE confirmed he is getting solid PON light, and all the other services are working fine as well.",
+          },
+          {
+            name: "DATA HELD IN SRIMs Doesn't MATCH WITH EMS DATA",
+            text: "Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]], reporting data held in SRIMS and EMS does not match or is missing for ONT serial number on [[ROUTE]]. Check with EMS and SRIMs found different ONT with serial number [[SPARE_ONT]] present in SRIMS updated it with the correct one. CSE confirm the line test pass with no problem found.",
+          },
+          {
+            name: "CBT STATUS NOTES",
+            text: "Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]] wants to know the status of the CBT, log in into EMS [[ROUTE]] and confirmed the CBT status was up. Informed the CSE that the CBT is toggle ON.",
+          },
+          {
+            name: "ROUTING UPDATE",
+            text: "DCoE Notes: Received a call from CSE [[NAME] ] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Checked the milestone for V21, which had already been initiated, but V21 had failed due to an exception [FTTP Invalid ONT Serial Number]. Cleared the error by manually building the circuit. while building the circuit found the FE Bridge option is missing for route[........... ], so build the circuit on[ ................ ] and raise an incedent to SRIMs team for updating the route with incedent ID - [ REQ.... ]. CSE confirmed that they are receiving a solid PON light and that all other services are functioning correctly. but reporting EMS cable link configuration issue, advice the CSE to delay the JOB for 24 hours as we have already raise an incedent.",
+          },
+          {
+            name: "EMS CABLE LINK",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]], with ONT serial number [[ONT_SERIAL]], reporting EMS cable link configuration issue on [[ROUTE]]. Upon investigation, found that the builds are missing, so manually build the circuit and perform a woosh line test which is pass with no problem found. CSE confirmed that they are receiving a solid PON light and that all other services are functioning correctly.",
+          },
+          {
+            name: "CSE Real-Time ONT/Line Loss Issue",
+            text: "CSE [[NAME]] reported a real-time ONT/line loss issue for EIN:- [[EIN]], working on [[OGEA]]. Upon checking on EMS, found high light reading at the ONT [[LIGHT]]. Advised the CSE to investigate the network between the ONT and the splitter, verify all splices, and coordinate with the N11 Engineer for further assistance. [Route: [[ROUTE]]]",
+          },
+          {
+            name: "V21 Failure Queue",
+            text: "DCoE Notes: Received a call from CSE [[NAME]] with EIN [[EIN]], working on [[OGEA]]. CSE scanned the ONT serial number [[ONT_SERIAL]] but encountered a flashing PON light on [[ROUTE]]. Checked the milestone for V21, which had already been initiated, but V21 had failed due to an exception [FTTP V21 Failure Queue]. Cleared the error by manually building the circuit. CSE confirmed a solid PON light, and all other services were functioning correctly and progressed the exception by performing NEXT in HUD.",
+          },
+
+          // Add more defaults here
+        ];
+
+        // Merge defaults into localStorage if missing
+        defaultTemplates.forEach((tpl) => {
+          if (!stored.find((t) => t.name === tpl.name)) {
+            stored.push(tpl);
+          }
+        });
+
+        localStorage.setItem("noteTemplates", JSON.stringify(stored));
+        return defaultTemplates;
+      }
+
+      function init() {
+        console.log("FTTP ES Notes Loaded");
+
+        initTemplates();
+        bindEvents();
+        setupInputValidation();
+        loadHistory();
+        loadTemplates();
+        generateSpeedCards();
+        populateNoteTypeDropdown();
+
+        makeDesktopProfilesCopyable();
+      }
+
+      function bindEvents() {
+        document
+          .getElementById("themeToggle")
+          .addEventListener("click", toggleTheme);
+
+        document
+          .getElementById("mobileThemeBtn")
+          .addEventListener("click", toggleTheme);
+
+        document
+          .getElementById("menuBtn")
+          .addEventListener("click", toggleMobileMenu);
+
+        document
+          .getElementById("speedTableToggle")
+          .addEventListener("click", toggleSpeedTable);
+
+        document
+          .getElementById("speedSearch")
+          .addEventListener("keyup", filterSpeedTable);
+
+        document
+          .getElementById("toggleHelpBtn")
+          .addEventListener("click", toggleHelpLine);
+
+        document
+          .getElementById("clearBtn")
+          .addEventListener("click", clearForm);
+
+        document
+          .getElementById("generateBtn")
+          .addEventListener("click", handleGenerateNote);
+
+        document
+          .getElementById("ogeaLabel")
+          .addEventListener("click", () => copyFromInput("ogea"));
+        document
+          .getElementById("einLabel")
+          .addEventListener("click", () => copyFromInput("ein"));
+        document
+          .getElementById("ontLabel")
+          .addEventListener("click", () => copyFromInput("ontSerial"));
+        document
+          .getElementById("spareOntLabel")
+          .addEventListener("click", () => copyFromInput("spareOnt"));
+
+        document.getElementById("copyBtn").addEventListener("click", copyNote);
+        document
+          .getElementById("editBtn")
+          .addEventListener("click", toggleEdit);
+        //   document.addEventListener("click", handleOutsideClick);
+
+        document.getElementById("saveBtn").addEventListener("click", saveNote);
+
+        document
+          .getElementById("historyBtn")
+          .addEventListener("click", openHistory);
+
+        document
+          .getElementById("mobileHistoryBtn")
+          .addEventListener("click", openHistory);
+
+        document
+          .getElementById("closeHistoryBtn")
+          .addEventListener("click", closeHistory);
+
+        document
+          .getElementById("historyModal")
+          .addEventListener("click", (e) => {
+            if (e.target.id === "historyModal") {
+              closeHistory();
+            }
+          });
+
+        document
+          .getElementById("historySearch")
+          .addEventListener("input", filterHistory);
+        document
+          .getElementById("sortHistory")
+          .addEventListener("change", (e) => sortHistory(e.target.value));
+        document
+          .getElementById("deleteHistoryBtn")
+          .addEventListener("click", clearHistory);
+
+        document
+          .getElementById("openTemplateBtn")
+          .addEventListener("click", openTemplateModal);
+        document
+          .getElementById("addTemplateBtn")
+          .addEventListener("click", addTemplate);
+
+        document
+          .getElementById("clearTemplateBtn")
+          .addEventListener("click", function () {
+            document.getElementById("templateName").value = "";
+            document.getElementById("templateText").value = "";
+            document.getElementById("templatePreview").classList.add("hidden"); // hide preview if visible
+            document.getElementById("templatePreview").innerText = ""; // clear preview content
+            // Hide Save button when fields are cleared
+            document.getElementById("saveTemplateBtn").classList.add("hidden");
+            s;
+            showToast("Fields cleared", "modal"); // optional toast message
+          });
+
+        document
+          .getElementById("clearTemplatesBtn")
+          .addEventListener("click", clearTemplates);
+
+        document
+          .getElementById("resetTemplatesBtn")
+          .addEventListener("click", resetTemplates);
+
+        // ✅ Add your footer help toggle here
+        const footerHelpBtn = document.getElementById("footerHelpBtn");
+        const helpContent = document.getElementById("helpContent");
+
+        if (footerHelpBtn && helpContent) {
+          footerHelpBtn.addEventListener("click", () => {
+            helpContent.classList.toggle("hidden");
+          });
+        }
+
+        document
+          .getElementById("closeTemplateBtn")
+          .addEventListener("click", closeTemplateModal);
+        document
+          .getElementById("previewTemplateBtn")
+          .addEventListener("click", previewTemplate);
+        document
+          .getElementById("templateSearch")
+          .addEventListener("input", filterTemplates);
+        document
+          .getElementById("scrollTopBtn")
+          .addEventListener("click", scrollToTop);
+
+        document
+          .getElementById("templateSort")
+          .addEventListener("change", () => {
+            const templates =
+              JSON.parse(localStorage.getItem("noteTemplates")) || [];
+            renderTemplates(templates);
+          });
+
+        // Attach event listeners so SASA updates automatically
+        document
+          .getElementById("correctRoute")
+          .addEventListener("input", autoFillSasa);
+        document
+          .getElementById("incorrectRoute")
+          .addEventListener("input", autoFillSasa);
+
+        //mobile menu
+        document
+          .getElementById("mobileAddTemplateBtn")
+          .addEventListener("click", openTemplateModal);
+
+        const mobileSearch = document.getElementById("speedCardSearch");
+
+        if (mobileSearch) {
+          mobileSearch.addEventListener("input", filterSpeedCards);
+        }
+
+        const noteTypeInput = document.getElementById("noteType");
+        const noteTypeDropdown = document.getElementById("noteTypeDropdown");
+
+        if (noteTypeInput && noteTypeDropdown) {
+          // Show dropdown
+          noteTypeInput.addEventListener("focus", () => {
+            populateNoteTypeDropdown(noteTypeInput.value);
+            noteTypeDropdown.classList.remove("hidden");
+          });
+
+          // Filter while typing
+          noteTypeInput.addEventListener("input", () => {
+            populateNoteTypeDropdown(noteTypeInput.value);
+            noteTypeDropdown.classList.remove("hidden");
+          });
+
+          // Select item
+          noteTypeDropdown.addEventListener("click", (e) => {
+            const btn = e.target.closest("button");
+
+            if (!btn) return;
+
+            noteTypeInput.value = btn.dataset.name;
+
+            noteTypeDropdown.classList.add("hidden");
+          });
+
+          // Hide outside click
+          document.addEventListener("click", (e) => {
+            if (
+              !noteTypeInput.contains(e.target) &&
+              !noteTypeDropdown.contains(e.target)
+            ) {
+              noteTypeDropdown.classList.add("hidden");
+            }
+          });
+        }
+      }
+      //Modern dropdown
+      function populateNoteTypeDropdown(search = "") {
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+
+        const dropdown = document.getElementById("noteTypeDropdown");
+
+        if (!dropdown) return;
+
+        const filtered = templates.filter((tpl) =>
+          tpl.name.toLowerCase().includes(search.toLowerCase()),
+        );
+
+        dropdown.innerHTML = filtered
+          .map(
+            (template) => `
+      <button
+        type="button"
+        class="w-full px-4 py-3 text-left hover:bg-indigo-50 border-b last:border-b-0"
+        data-name="${template.name}"
+      >
+        ${template.name}
+      </button>
+    `,
+          )
+          .join("");
+      }
+
+      function selectTemplate(name) {
+        document.getElementById("noteType").value = name;
+        document.getElementById("noteTypeDropdown").classList.add("hidden");
+      }
+
+      function toggleTheme() {
+        document.body.classList.toggle("dark");
+
+        const icon = document.body.classList.contains("dark") ? "☀️" : "🌙";
+
+        document.getElementById("themeToggle").textContent = icon;
+        document.getElementById("mobileThemeBtn").textContent = icon;
+      }
+
+      const form = document.getElementById("engineerForm");
+
+      const generateBtn = document.getElementById("generateBtn");
+
+      const output = document.getElementById("output");
+      const noteStatus = document.getElementById("noteStatus");
+
+      const copyBtn = document.getElementById("copyBtn");
+
+      const noteTypeInput = document.getElementById("noteType");
+      const noteTypesList = document.getElementById("noteTypes");
+
+      function validateForm(data) {
+        if (!data.ein) return "Engineer EIN is required";
+
+        if (!data.engineerName) return "Engineer Name is required";
+
+        if (!data.ogea) return "OGEA is required";
+
+        return null;
+      }
+
+      function toggleMobileMenu() {
+        document.getElementById("mobileMenu").classList.toggle("hidden");
+      }
+
+      function toggleSpeedTable() {
+        const wrapper = document.getElementById("speedTableWrapper");
+        const icon = document.getElementById("speedTableArrow");
+
+        if (wrapper.classList.contains("max-h-0")) {
+          wrapper.classList.remove("max-h-0");
+          wrapper.classList.add("max-h-[1000px]");
+
+          icon.style.transform = "rotate(180deg)";
+        } else {
+          wrapper.classList.remove("max-h-[1000px]");
+          wrapper.classList.add("max-h-0");
+
+          icon.style.transform = "rotate(0deg)";
+        }
+      }
+      function filterSpeedTable() {
+        const searchValue = document
+          .getElementById("speedSearch")
+          .value.trim()
+          .toLowerCase();
+
+        const rows = document.querySelectorAll("#speedTable tbody tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+
+          const type = cells[0]?.textContent.trim().toLowerCase() || "";
+          const upstream = cells[1]?.textContent.trim() || "";
+          const downstream = cells[2]?.textContent.trim() || "";
+
+          const speedPair = `${upstream}-${downstream}`.toLowerCase();
+          const speedSpace = `${upstream} ${downstream}`.toLowerCase();
+
+          const rowText = row.textContent.toLowerCase();
+
+          const match =
+            rowText.includes(searchValue) ||
+            speedPair.includes(searchValue) ||
+            speedSpace.includes(searchValue) ||
+            type.includes(searchValue);
+
+          row.style.display = match ? "" : "none";
+        });
+        const cards = document.querySelectorAll("#speedCards > div");
+
+        cards.forEach((card) => {
+          const text = card.textContent.toLowerCase();
+
+          card.style.display = text.includes(searchValue) ? "" : "none";
+        });
+      }
+
+      //help-Line
+
+      const appState = {
+        notes: [],
+      };
+
+      // ---------- State ----------
+      let helpNotes = JSON.parse(localStorage.getItem("helpNotes")) || [
+        "Advice the CSE to give us call back.",
+        "Advice the CSE to contact to the service provider.",
+        "CSE confirmed solid PON light and all services working.",
+      ];
+
+      // ---------- Modal ----------
+      document
+        .getElementById("openModalBtn")
+        .addEventListener("click", openModal);
+
+      function openModal() {
+        document.getElementById("helpModal").classList.remove("hidden");
+        renderHelpNotesModal();
+      }
+
+      function closeModal() {
+        document.getElementById("helpModal").classList.add("hidden");
+      }
+
+      // ---------- Renderers ----------
+      function renderHelpNotesModal() {
+        const list = document.getElementById("helpList");
+        list.innerHTML = helpNotes
+          .map(
+            (note, index) => `
+        <div class="flex justify-between items-center bg-orange-50 p-2 rounded">
+          <span contenteditable="true" 
+                onblur="updateHelpNote(${index}, this.textContent)" 
+                class="flex-grow p-1 rounded focus:outline-none">${note}</span>
+          <button onclick="deleteHelpNote(${index})" class="ml-2 px-2 py-1 bg-red-500 text-white rounded"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function renderHelpNotesHome() {
+        const container = document.getElementById("helpContainer");
+        container.innerHTML = helpNotes
+          .map(
+            (note) => `
+        <div class="bg-white border rounded-lg p-3 shadow-sm cursor-pointer hover:bg-orange-100"
+             onclick="copyHelpNote(this)">
+          ${note}
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      // ---------- CRUD ----------
+      function addHelpNote() {
+        const input = document.getElementById("newNoteInput");
+        const note = input.value.trim();
+        if (note) {
+          helpNotes.push(note);
+          input.value = "";
+          refreshAll();
+        }
+      }
+
+      function updateHelpNote(index, newText) {
+        if (newText.trim() !== "") {
+          helpNotes[index] = newText.trim();
+          refreshAll();
+        }
+      }
+
+      function deleteHelpNote(index) {
+        helpNotes.splice(index, 1);
+        refreshAll();
+      }
+
+      // ---------- Sync ----------
+      function refreshAll() {
+        saveNotes();
+        renderHelpNotesModal();
+        renderHelpNotesHome();
+      }
+
+      // ---------- Persistence ----------
+      function saveNotes() {
+        localStorage.setItem("helpNotes", JSON.stringify(helpNotes));
+      }
+
+      // ---------- Home Toggle ----------
+      function toggleHelpLine() {
+        const container = document.getElementById("helpContainer");
+        const btn = document.getElementById("toggleHelpBtn");
+
+        if (container.classList.contains("hidden")) {
+          renderHelpNotesHome();
+          container.classList.remove("hidden");
+          btn.textContent = "Hide";
+        } else {
+          container.classList.add("hidden");
+          btn.textContent = "Show";
+        }
+      }
+
+      // ---------- Copy ----------
+      function copyHelpNote(element) {
+        navigator.clipboard.writeText(element.textContent.trim());
+        const original = element.innerHTML;
+        element.innerHTML = "✅ Copied!";
+        setTimeout(() => {
+          element.innerHTML = original;
+        }, 1000);
+      }
+
+      //Clear Form
+
+      function clearForm() {
+        document
+          .querySelectorAll("input, textarea, select")
+          .forEach((field) => {
+            if (field.type === "checkbox" || field.type === "radio") {
+              field.checked = false;
+            } else {
+              field.value = "";
+            }
+          });
+
+        // Restore default OGEA value
+        document.getElementById("ogea").value = "OGEA";
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+
+        // ✅ Clear the generated note output
+        const output = document.getElementById("output");
+        if (output) {
+          output.textContent = "";
+        }
+        // ✅ Optionally reset status text if you have one
+        const noteStatus = document.getElementById("noteStatus");
+        if (noteStatus) {
+          noteStatus.textContent = "Ready";
+        }
+      }
+
+      //Validation
+
+      function setupInputValidation() {
+        const einInput = document.getElementById("ein");
+        const ogeaInput = document.getElementById("ogea");
+        const ontInput = document.getElementById("ontSerial");
+        const spareOntInput = document.getElementById("spareOnt");
+        const nameInput = document.getElementById("name");
+        const lightInput = document.getElementById("light");
+        const upstreamInput = document.getElementById("upstream");
+        const downstreamInput = document.getElementById("downstream");
+
+        // EIN - Numbers only
+        einInput.addEventListener("input", () => {
+          einInput.value = einInput.value.replace(/\D/g, "");
+        });
+
+        [ogeaInput, ontInput, spareOntInput].forEach((field) => {
+          if (field) {
+            field.addEventListener("input", () => {
+              field.value = field.value.replace(/\s+/g, "");
+            });
+          }
+        });
+
+        [ontInput, spareOntInput].forEach((field) => {
+          field.addEventListener("input", () => {
+            field.value = field.value.toUpperCase().replace(/\s+/g, "");
+          });
+        });
+
+        // OGEA - Always uppercase
+        ogeaInput.addEventListener("input", () => {
+          let value = ogeaInput.value.toUpperCase();
+
+          // Always keep OGEA prefix
+          if (!value.startsWith("OGEA")) {
+            value = "OGEA" + value.replace(/^OGEA/i, "");
+          }
+
+          // Max 12 characters total
+          ogeaInput.value = value.substring(0, 12);
+        });
+
+        // Prevent deleting OGEA prefix
+        ogeaInput.addEventListener("keydown", (e) => {
+          const cursorPos = ogeaInput.selectionStart;
+
+          if (
+            (e.key === "Backspace" && cursorPos <= 4) ||
+            (e.key === "Delete" && cursorPos < 4)
+          ) {
+            e.preventDefault();
+          }
+        });
+
+        // Initialize value
+        ogeaInput.value = "OGEA";
+
+        // Engineer Name - Letters only
+        nameInput.addEventListener("input", () => {
+          nameInput.value = nameInput.value.replace(/[^a-zA-Z\s]/g, "");
+        });
+
+        // Light Reading - Numbers only
+        lightInput.addEventListener("input", () => {
+          lightInput.value = lightInput.value.replace(/\D/g, "");
+        });
+
+        // Upstream - Numbers only
+        upstreamInput.addEventListener("input", () => {
+          upstreamInput.value = upstreamInput.value.replace(/\D/g, "");
+        });
+
+        // Downstream - Numbers only
+        downstreamInput.addEventListener("input", () => {
+          downstreamInput.value = downstreamInput.value.replace(/\D/g, "");
+        });
+      }
+
+      function handleGenerateNote() {
+        const ein = document.getElementById("ein").value.trim();
+        const ogea = document.getElementById("ogea").value.trim();
+        const name = document.getElementById("name").value.trim();
+
+        if (!ein) {
+          alert("Please enter EIN.");
+          document.getElementById("ein").focus();
+          return;
+        }
+
+        if (ein.length < 6) {
+          alert("Please enter a valid EIN.");
+          document.getElementById("ein").focus();
+          return;
+        }
+
+        if (!ogea || ogea === "OGEA") {
+          alert("Please enter a valid OGEA.");
+          document.getElementById("ogea").focus();
+          return;
+        }
+
+        if (ogea.length !== 12) {
+          alert("OGEA must be exactly 12 characters.");
+          document.getElementById("ogea").focus();
+          return;
+        }
+
+        if (!name) {
+          alert("Please enter Engineer Name.");
+          document.getElementById("name").focus();
+          return;
+        }
+
+        // All validations passed
+        generateNote();
+      }
+
+      function markInvalid(fieldId) {
+        document
+          .getElementById(fieldId)
+          .classList.add("border-red-500", "ring-2", "ring-red-300");
+      }
+
+      document.querySelectorAll("input, textarea").forEach((field) => {
+        field.addEventListener("input", () => {
+          field.classList.remove("border-red-500", "ring-2", "ring-red-300");
+        });
+      });
+
+      //Copy Content
+      function copyFromInput(inputId) {
+        const input = document.getElementById(inputId);
+        const toast = document.getElementById("toast");
+
+        if (input) {
+          navigator.clipboard.writeText(input.value).then(() => {
+            toast.textContent = "✅ Copied!";
+            toast.classList.remove("hidden");
+            toast.classList.add("show");
+
+            setTimeout(() => {
+              toast.classList.remove("show");
+              toast.classList.add("hidden");
+            }, 1500);
+          });
+        }
+      }
+
+      function generateNote() {
+        const noteType = document.getElementById("noteType").value;
+        // Try hard-coded first
+        let note = null;
+        // If not found, check user-added templates
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+
+        const tpl = templates.find((t) => t.name === noteType);
+
+        if (tpl) {
+          note = tpl.text;
+        }
+
+        if (!note) {
+          alert("Please select a valid note type.");
+          return;
+        }
+
+        const replacements = {
+          "[[NAME]]": `[${document.getElementById("name").value.trim()}]`,
+          "[[EIN]]": `[${document.getElementById("ein").value.trim()}]`,
+          "[[OGEA]]": `[${document.getElementById("ogea").value.trim()}]`,
+          "[[ONT_SERIAL]]": `[${document.getElementById("ontSerial").value.trim()}]`,
+          "[[SPARE_ONT]]": `[${document.getElementById("spareOnt").value.trim()}]`,
+          "[[ROUTE]]": `[${document.getElementById("route").value.trim()}]`,
+          "[[LIGHT]]": `[-${document.getElementById("light").value.trim()}dbm]`,
+          "[[REFERENCE]]": `[${document.getElementById("reference").value.trim()}]`,
+          "[[DOWNSTREAM]]": `[${document.getElementById("downstream").value.trim()}]`,
+          "[[UPSTREAM]]": `[${document.getElementById("upstream").value.trim()}]`,
+          "[[CORRECT_SASA]]": `[${document.getElementById("correctRoute").value.trim()}]`,
+          "[[INCORRECT_SASA]]": `[${document.getElementById("incorrectRoute").value.trim()}]`,
+          "[[SASA_1]]": `[${document.getElementById("sasa_1").value.trim()}]`,
+          "[[SASA_2]]": `[${document.getElementById("sasa_2").value.trim()}]`,
+        };
+
+        Object.entries(replacements).forEach(([placeholder, value]) => {
+          note = note.replaceAll(placeholder, value);
+        });
+
+        // ✅ Update output
+        const output = document.getElementById("output");
+        output.textContent = note;
+
+        // ✅ Update status
+        document.getElementById("noteStatus").textContent = "Generated";
+
+        // ✅ Scroll smoothly to the generated notes section
+        output.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function copyNote() {
+        const output = document.getElementById("output");
+
+        if (!output.textContent.trim()) {
+          alert("No note generated to copy.");
+          return;
+        }
+
+        navigator.clipboard.writeText(output.textContent).then(() => {
+          const btn = document.getElementById("copyBtn");
+
+          const originalText = btn.innerHTML;
+
+          btn.innerHTML = "✅ Copied!";
+          btn.disabled = true;
+
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }, 1500);
+        });
+      }
+
+      function toggleEdit() {
+        const output = document.getElementById("output");
+        const editBtn = document.getElementById("editBtn");
+        const noteStatus = document.getElementById("noteStatus");
+
+        // Check if there's any note text
+        if (!output.textContent.trim()) {
+          noteStatus.textContent = "No note to edit";
+          return; // stop here
+        }
+
+        const isEditing = output.contentEditable === "true";
+
+        if (isEditing) {
+          output.contentEditable = "false";
+          editBtn.innerHTML = "✏️ Edit";
+          noteStatus.textContent = "Saved";
+        } else {
+          output.contentEditable = "true";
+          output.focus();
+          editBtn.innerHTML = "Done";
+          noteStatus.textContent = "Editing...";
+        }
+      }
+
+      document.getElementById("output").addEventListener("blur", () => {
+        const output = document.getElementById("output");
+
+        if (output.contentEditable === "true") {
+          output.contentEditable = "false";
+
+          document.getElementById("editBtn").innerHTML = "✏️ Edit";
+          document.getElementById("noteStatus").textContent = "Saved";
+        }
+      });
+
+      function saveNote() {
+        const notes = JSON.parse(localStorage.getItem("fttpNotes")) || [];
+
+        const newNote = {
+          id: Date.now(),
+          ein: document.getElementById("ein").value.trim(),
+          ogea: document.getElementById("ogea").value.trim(),
+          ont: document.getElementById("ontSerial").value.trim(),
+          text: document.getElementById("output").textContent.trim(),
+          createdAt: new Date().toLocaleString(),
+        };
+
+        if (!newNote.text) {
+          alert("No note to save.");
+          return;
+        }
+
+        notes.unshift(newNote);
+
+        localStorage.setItem("fttpNotes", JSON.stringify(notes));
+
+        showToast("Note saved");
+      }
+
+      function isAnyModalOpen() {
+        return (
+          !document
+            .getElementById("historyModal")
+            .classList.contains("hidden") ||
+          !document.getElementById("templateModal").classList.contains("hidden")
+        );
+      }
+
+      function toggleScrollButton() {
+        document
+          .getElementById("scrollTopBtn")
+          .classList.toggle("hidden", isAnyModalOpen());
+      }
+
+      function openHistory() {
+        document.getElementById("historyModal").classList.remove("hidden");
+        toggleScrollButton();
+        loadHistory();
+      }
+
+      function loadHistory() {
+        let notes = JSON.parse(localStorage.getItem("fttpNotes")) || [];
+        renderHistory(notes);
+      }
+
+      function renderHistory(notes) {
+        const historyList = document.getElementById("historyList");
+        historyList.innerHTML = "";
+
+        if (!notes.length) {
+          historyList.innerHTML = "<p class='text-gray-500'>No results</p>";
+          return;
+        }
+
+        notes.forEach((item) => {
+          historyList.innerHTML += `
+      <div class="border rounded-xl p-4 shadow-sm hover:shadow-md transition">
+        <div class="text-xs text-gray-500 mb-2">${item.createdAt}</div>
+        <div class="text-sm mb-2">
+          <b>EIN:</b> ${item.ein || "-"} |
+          <b>OGEA:</b> ${item.ogea || "-"} |
+          <b>ONT:</b> ${item.ont || "-"}
+        </div>
+        <div class="text-sm whitespace-pre-wrap mb-2">${item.text}</div>
+        <button
+          onclick="copyNoteText('${item.text.replace(/'/g, "\\'")}')"
+          class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          📋 Copy
+        </button>
+      </div>
+    `;
+        });
+      }
+
+      function copyNoteText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast("Note copied!");
+        });
+      }
+
+      function filterHistory() {
+        const value = document
+          .getElementById("historySearch")
+          .value.toLowerCase();
+        let notes = JSON.parse(localStorage.getItem("fttpNotes")) || [];
+
+        const filtered = notes.filter(
+          (n) =>
+            (n.ein || "").toLowerCase().includes(value) ||
+            (n.ogea || "").toLowerCase().includes(value) ||
+            (n.ont || "").toLowerCase().includes(value) ||
+            (n.text || "").toLowerCase().includes(value),
+        );
+
+        renderHistory(filtered);
+      }
+
+      function sortHistory(mode) {
+        let notes = JSON.parse(localStorage.getItem("fttpNotes")) || [];
+
+        if (mode === "asc") notes.sort((a, b) => a.id - b.id);
+        if (mode === "desc") notes.sort((a, b) => b.id - a.id);
+        if (mode === "recent") notes.sort((a, b) => b.id - a.id);
+        if (mode === "modified")
+          notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        renderHistory(notes);
+      }
+
+      function closeHistory() {
+        const modal = document.getElementById("historyModal");
+        modal.classList.add("hidden");
+
+        // Reset search bar
+        const search = document.getElementById("historySearch");
+        if (search) search.value = "";
+
+        // Restore body scroll
+        document.body.style.overflow = "";
+
+        updateScrollProgress();
+      }
+
+      // Toast notification
+      let toastTimer;
+
+      function showToast(message, scope = "global") {
+        const toast =
+          scope === "modal"
+            ? document.getElementById("modalToast")
+            : document.getElementById("toast");
+
+        if (!toast) return;
+
+        clearTimeout(toastTimer);
+
+        toast.textContent = message;
+
+        toast.classList.remove("hidden");
+
+        requestAnimationFrame(() => {
+          toast.classList.add("show");
+        });
+
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+
+          setTimeout(() => {
+            toast.classList.add("hidden");
+          }, 300);
+        }, 2000);
+      }
+
+      function clearHistory() {
+        // Ask for confirmation before deleting
+        if (!confirm("Are you sure you want to delete all saved notes?"))
+          return;
+
+        // Remove notes from localStorage
+        localStorage.removeItem("fttpNotes");
+
+        // Refresh the modal list
+        renderHistory([]);
+
+        // Show feedback
+        showToast("History cleared");
+      }
+
+      // Template Modal
+
+      function openTemplateModal() {
+        document.getElementById("templateModal").classList.remove("hidden");
+        toggleScrollButton();
+        loadTemplates();
+      }
+
+      function closeTemplateModal() {
+        document.getElementById("templateModal").classList.add("hidden");
+        updateScrollProgress();
+      }
+
+      function loadTemplates() {
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+        renderTemplates(templates);
+      }
+
+      function renderTemplates(templates) {
+        const list = document.getElementById("templateList");
+        list.innerHTML = "";
+
+        if (!templates.length) {
+          list.innerHTML =
+            "<p class='text-gray-500'>No templates added yet</p>";
+          return;
+        }
+
+        const sortOption =
+          document.getElementById("templateSort")?.value || "recent";
+        if (sortOption === "recent") {
+          templates = [...templates].reverse();
+        }
+
+        templates.forEach((tpl) => {
+          const item = document.createElement("div");
+          item.className =
+            "bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition";
+
+          item.innerHTML = `
+<div class="flex gap-4 justify-between">
+
+  <div class="flex-1 min-w-0">
+    <h3 class="font-semibold text-indigo-600 mb-2">${tpl.name}</h3>
+    <p class="text-sm text-gray-600 whitespace-pre-line break-words">
+      ${tpl.text.replace(/^\s+/gm, "")}
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-2 shrink-0">
+    <button
+      onclick="editTemplate('${tpl.name}')"
+      class="px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+    >
+      <i class="fa-regular fa-pen-to-square"></i>
+    </button>
+
+    <button
+      onclick="deleteTemplate('${tpl.name}')"
+      class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+    >
+      <i class="fa-solid fa-trash"></i>
+    </button>
+  </div>
+
+</div>
+`;
+          list.appendChild(item);
+        });
+
+        document.getElementById("templateCount").textContent =
+          `${templates.length} Templates`;
+      }
+
+      function addTemplate() {
+        const name = document.getElementById("templateName").value.trim();
+        const text = document.getElementById("templateText").value.trim();
+
+        if (!name || !text) {
+          alert("Please enter both name and text for the template.");
+          return;
+        }
+
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+        templates.push({ name, text });
+
+        localStorage.setItem("noteTemplates", JSON.stringify(templates));
+        renderTemplates(templates);
+        populateNoteTypeDropdown();
+
+        document.getElementById("templateName").value = "";
+        document.getElementById("templateText").value = "";
+        showToast("Template added", "modal");
+      }
+
+      function editTemplate(name) {
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+        const tpl = templates.find((t) => t.name === name);
+        if (!tpl) return;
+
+        document.getElementById("templateName").value = tpl.name;
+        document.getElementById("templateText").value = tpl.text;
+
+        const saveBtn = document.getElementById("saveTemplateBtn");
+        saveBtn.classList.remove("hidden"); // show only Save when editing
+
+        // Scroll to form (mobile-friendly)
+        document
+          .getElementById("templateName")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+
+        saveBtn.onclick = function () {
+          const newName = document.getElementById("templateName").value.trim();
+          const newText = document.getElementById("templateText").value.trim();
+
+          if (!newName || !newText) {
+            alert("Please enter both name and text.");
+            return;
+          }
+
+          const updatedTemplates = templates.map((t) =>
+            t.name === name ? { name: newName, text: newText } : t,
+          );
+
+          localStorage.setItem(
+            "noteTemplates",
+            JSON.stringify(updatedTemplates),
+          );
+          renderTemplates(updatedTemplates);
+          populateNoteTypeDropdown();
+
+          document.getElementById("templateName").value = "";
+          document.getElementById("templateText").value = "";
+          saveBtn.classList.add("hidden"); // hide Save after update
+
+          showToast("Template updated", "modal");
+        };
+      }
+
+      function deleteTemplate(name) {
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+
+        // ✅ Confirmation popup
+        const confirmed = confirm(`Are you sure you want to delete "${name}"?`);
+        if (!confirmed) return;
+
+        // ✅ Delete by name
+        const updatedTemplates = templates.filter((tpl) => tpl.name !== name);
+
+        localStorage.setItem("noteTemplates", JSON.stringify(updatedTemplates));
+        renderTemplates(updatedTemplates);
+        populateNoteTypeDropdown();
+        showToast("Template deleted", "modal");
+      }
+
+      function clearTemplates() {
+        if (!confirm("Delete all templates?")) return;
+
+        localStorage.removeItem("noteTemplates");
+        renderTemplates([]);
+        populateNoteTypeDropdown();
+        showToast("All templates cleared", "modal");
+      }
+
+      function resetTemplates() {
+        if (
+          !confirm(
+            "Reset to default templates? This will overwrite your current templates.",
+          )
+        )
+          return;
+
+        const defaults = initTemplates(); // ✅ call to get defaults
+        localStorage.setItem("noteTemplates", JSON.stringify(defaults));
+        renderTemplates(defaults);
+        populateNoteTypeDropdown();
+        showToast("Templates reset to default", "modal");
+      }
+
+      const placeholders = [
+        "NAME",
+        "EIN",
+        "OGEA",
+        "ONT_SERIAL",
+        "SPARE_ONT",
+        "ROUTE",
+        "LIGHT",
+        "REFERENCE",
+        "DOWNSTREAM",
+        "UPSTREAM",
+        "CORRECT_SASA",
+        "INCORRECT_SASA",
+        "SASA_1",
+        "SASA_2",
+      ];
+
+      const toolbar = document.getElementById("toolbar");
+      const textarea = document.getElementById("templateText");
+
+      // Build toolbar buttons dynamically
+      placeholders.forEach((ph) => {
+        const btn = document.createElement("button");
+        btn.textContent = ph;
+        btn.className =
+          "px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700";
+        btn.addEventListener("click", () => insertPlaceholder(ph));
+        toolbar.appendChild(btn);
+      });
+
+      function insertPlaceholder(token) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+
+        // Insert placeholder at cursor
+        textarea.value =
+          text.substring(0, start) + `[[${token}]]` + text.substring(end);
+
+        // Move cursor after inserted token
+        textarea.selectionStart = textarea.selectionEnd =
+          start + `[[${token}]]`.length;
+        textarea.focus();
+      }
+
+      //template place holder validation
+      document.addEventListener("DOMContentLoaded", () => {
+        const validPlaceholders = [
+          "NAME",
+          "EIN",
+          "OGEA",
+          "ONT_SERIAL",
+          "SPARE_ONT",
+          "ROUTE",
+          "LIGHT",
+          "REFERENCE",
+          "DOWNSTREAM",
+          "UPSTREAM",
+          "CORRECT_SASA",
+          "INCORRECT_SASA",
+          "SASA_1",
+          "SASA_2",
+        ];
+
+        const textarea = document.getElementById("templateText");
+        const hints = document.getElementById("validationHints");
+
+        textarea.addEventListener("input", validateTemplate);
+
+        function validateTemplate() {
+          const text = textarea.value;
+          const errors = [];
+
+          // Match [[PLACEHOLDER]]
+          const regexDouble = /\[\[([A-Za-z0-9_]+)\]\]/g;
+
+          // Match [PLACEHOLDER] but not [[PLACEHOLDER]]
+          const regexSingle = /(?<!\[)\[([A-Za-z0-9_]+)\](?!\])/g;
+
+          let match;
+
+          // -----------------------------
+          // Check valid double brackets
+          // -----------------------------
+          while ((match = regexDouble.exec(text)) !== null) {
+            const token = match[1];
+
+            if (!validPlaceholders.includes(token)) {
+              errors.push(`[[${match[1]}]] → invalid placeholder`);
+            }
+          }
+
+          // -----------------------------
+          // Check single brackets
+          // -----------------------------
+          while ((match = regexSingle.exec(text)) !== null) {
+            const token = match[1].toUpperCase();
+
+            if (validPlaceholders.includes(token)) {
+              errors.push(`[${match[1]}] → should be [[${token}]]`);
+            } else {
+              errors.push(
+                `[${match[1]}] → invalid placeholder and should use double brackets`,
+              );
+            }
+          }
+
+          // -----------------------------
+          // Remove all valid placeholders
+          // before malformed checks
+          // -----------------------------
+          const cleanedText = text
+            .replace(/\[\[[A-Za-z0-9_]+\]\]/g, "")
+            .replace(/(?<!\[)\[[A-Za-z0-9_]+\](?!\])/g, "");
+
+          // -----------------------------
+          // Check unmatched brackets
+          // -----------------------------
+          const openCount = (cleanedText.match(/\[/g) || []).length;
+          const closeCount = (cleanedText.match(/\]/g) || []).length;
+
+          if (openCount > closeCount) {
+            errors.push("Missing closing bracket ]");
+          }
+
+          if (closeCount > openCount) {
+            errors.push("Missing opening bracket [");
+          }
+
+          // -----------------------------
+          // Display results
+          // -----------------------------
+          if (errors.length > 0) {
+            hints.innerHTML = errors
+              .map(
+                (err) => `<span class="text-red-600">❌ Invalid: ${err}</span>`,
+              )
+              .join("<br>");
+          } else {
+            hints.innerHTML =
+              '<span class="text-green-600">✅ All placeholders valid</span>';
+          }
+        }
+
+        // Run once on load
+        validateTemplate();
+      });
+
+      //previewTemplate
+      function previewTemplate() {
+        const previewBox = document.getElementById("templatePreview");
+        const name = document.getElementById("templateName").value.trim();
+        let text = document.getElementById("templateText").value.trim();
+
+        if (!name || !text) {
+          alert("Please enter both name and text to preview.");
+          return;
+        }
+
+        // Toggle off if already visible
+        if (!previewBox.classList.contains("hidden")) {
+          previewBox.classList.add("hidden");
+          previewBox.textContent = "";
+          return;
+        }
+
+        // Replace placeholders with sample values
+        const sampleReplacements = {
+          "[[NAME]]": "[John Doe]",
+          "[[EIN]]": "[123456]",
+          "[[OGEA]]": "[OGEA12345678]",
+          "[[ONT_SERIAL]]": "[ONT987654]",
+          "[[SPARE_ONT]]": "[SPARE123]",
+          "[[ROUTE]]": "[Route-45]",
+          "[[LIGHT]]": "[-20dbm]",
+          "[[REFERENCE]]": "[REF001]",
+          "[[DOWNSTREAM]]": "[100 Mbps]",
+          "[[UPSTREAM]]": "[50 Mbps]",
+        };
+
+        Object.entries(sampleReplacements).forEach(([placeholder, value]) => {
+          text = text.replaceAll(placeholder, value);
+        });
+
+        previewBox.textContent = text;
+        previewBox.classList.remove("hidden");
+      }
+
+      // function filterTemplates() {
+      function normalize(str) {
+        return str.toLowerCase().replace(/[^a-z0-9]/g, ""); // remove non-alphanumeric
+      }
+
+      function filterTemplates() {
+        const value = normalize(
+          document.getElementById("templateSearch").value,
+        );
+
+        const templates =
+          JSON.parse(localStorage.getItem("noteTemplates")) || [];
+
+        const filtered = templates.filter(
+          (tpl) =>
+            normalize(tpl.name).includes(value) ||
+            normalize(tpl.text).includes(value),
+        );
+
+        renderTemplates(filtered);
+      }
+
+      function scrollToTop() {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
+      function updateScrollProgress() {
+        const btn = document.getElementById("scrollTopBtn");
+        const circle = document.getElementById("progressCircle");
+
+        if (!btn || !circle) return;
+
+        if (isAnyModalOpen()) {
+          btn.classList.add("hidden");
+          return;
+        }
+
+        const scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop;
+
+        const scrollHeight =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+
+        const progress = (scrollTop / scrollHeight) * 100;
+
+        const label = document.getElementById("scrollLabel");
+
+        if (label) {
+          label.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Circle calculations
+        const radius = 45;
+        const circumference = 2 * Math.PI * radius;
+
+        circle.style.strokeDasharray = circumference;
+
+        const offset = circumference - (progress / 100) * circumference;
+
+        circle.style.strokeDashoffset = offset;
+
+        // Show button after scrolling
+        if (scrollTop > 300) {
+          btn.classList.remove("hidden");
+        } else {
+          btn.classList.add("hidden");
+        }
+      }
+
+      window.addEventListener("scroll", updateScrollProgress);
+
+      window.addEventListener("load", updateScrollProgress);
+
+      function filterSpeedCards() {
+        const search = document
+          .getElementById("speedCardSearch")
+          .value.toLowerCase();
+
+        document.querySelectorAll(".speed-card").forEach((card) => {
+          const text = card.dataset.search || "";
+
+          card.style.display = text.includes(search) ? "block" : "none";
+        });
+      }
+
+      function generateSpeedCards() {
+        const tbody = document.querySelector("#speedTable tbody");
+        const cardContainer = document.getElementById("speedCards");
+
+        if (!tbody || !cardContainer) return;
+
+        cardContainer.innerHTML = "";
+
+        const rows = tbody.querySelectorAll("tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+
+          if (cells.length < 5) return;
+
+          const type = cells[0].textContent.trim();
+          const upstream = cells[1].textContent.trim();
+          const downstream = cells[2].textContent.trim();
+          const ontProfile = cells[3].textContent.trim();
+          const downstreamProfile = cells[4].textContent.trim();
+
+          const card = document.createElement("div");
+
+          card.className = "speed-card bg-white rounded-xl shadow border p-4";
+
+          card.dataset.search =
+            `${type} ${upstream} ${downstream} ${upstream}-${downstream} ${ontProfile} ${downstreamProfile}`.toLowerCase();
+
+          card.innerHTML = `
+      <div class="flex justify-between items-center mb-3">
+        <span class="font-semibold text-indigo-600">${type}</span>
+        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+          ${upstream} / ${downstream}
+        </span>
+      </div>
+
+      <div class="space-y-2 text-sm">
+<div>
+  <div class="font-medium text-gray-500">Upstream Profile</div>
+  <div
+    class="break-all cursor-pointer text-indigo-600 hover:underline"
+    onclick="copyProfile('${ontProfile}')"
+  >
+    ${ontProfile}
+  </div>
+</div>
+
+<div>
+  <div class="font-medium text-gray-500">Downstream Profile</div>
+  <div
+    class="break-all cursor-pointer text-indigo-600 hover:underline"
+    onclick="copyProfile('${downstreamProfile}')"
+  >
+    ${downstreamProfile}
+  </div>
+</div>
+      </div>
+    `;
+
+          cardContainer.appendChild(card);
+        });
+      }
+
+      function copyProfile(profile) {
+        navigator.clipboard.writeText(profile).then(() => {
+          showToast(`Copied: ${profile}`);
+        });
+      }
+
+      function makeDesktopProfilesCopyable() {
+        const rows = document.querySelectorAll("#speedTable tbody tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+
+          if (cells.length < 5) return;
+
+          // Upstream Profile column
+          [cells[3], cells[4]].forEach((cell) => {
+            cell.classList.add(
+              "cursor-pointer",
+              "text-indigo-600",
+              "hover:underline",
+              "font-medium",
+            );
+
+            cell.title = "Click to copy";
+
+            cell.addEventListener("click", () => {
+              copyProfile(cell.textContent.trim());
+            });
+          });
+        });
+      }
+
+      //AUTO SASA FINDER
+
+      // Lookup function
+      function findSasaFromRoute(route) {
+        if (!route || route.trim() === "") return null;
+
+        const normalizedRoute = route.trim().replace(/^\/+/, "");
+        const match = templateList.find((entry) =>
+          normalizedRoute.includes(entry.path),
+        );
+
+        return match ? `${match.sasa} (${match.group})` : null;
+      }
+
+      // Auto-fill SASA fields
+      function autoFillSasa() {
+        const correctRoute = document.getElementById("correctRoute").value;
+        const incorrectRoute = document.getElementById("incorrectRoute").value;
+
+        const correctSasa = findSasaFromRoute(correctRoute);
+        const incorrectSasa = findSasaFromRoute(incorrectRoute);
+
+        document.getElementById("sasa_1").value = correctSasa || " Not Found";
+        document.getElementById("sasa_2").value = incorrectSasa || " Not Found";
+      }
+    </script>
+  </body>
+</html>
